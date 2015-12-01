@@ -1,0 +1,21 @@
+{
+  "name": "homebridge-delay-switch",
+  "version": "0.0.1",
+  "description": "Delay switches for Homebridge: https://github.com/nfarina/homebridge",
+  "license": "ISC",
+  "keywords": [
+    "homebridge-plugin",
+    "delay"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nitaybz/homebridge-delay-switch.git"
+  },
+  "bugs": {
+    "url": "http://github.com/nitaybz/homebridge-delay-switch/issues"
+  },
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  }
+}
