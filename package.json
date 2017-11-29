@@ -10,10 +10,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/grover/homebridge-delayed-switch.git"
+    "url": "git://github.com/grover/homebridge-delayed-switches.git"
   },
   "bugs": {
-    "url": "http://github.com/grover/homebridge-delayed-switch/issues"
+    "url": "http://github.com/grover/homebridge-delayed-switches/issues"
   },
   "engines": {
     "node": ">=0.12.0",
