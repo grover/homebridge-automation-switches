@@ -1,18 +1,19 @@
 {
-  "name": "homebridge-delay-switch",
-  "version": "0.0.1",
-  "description": "Delay switches for Homebridge: https://github.com/nfarina/homebridge",
+  "name": "homebridge-delayed-switches",
+  "version": "0.8.0",
+  "description": "A platform for delayed switches for HomeKit via Homebridge",
   "license": "ISC",
+  "main": "src/index.js",
   "keywords": [
     "homebridge-plugin",
     "delay"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/nitaybz/homebridge-delay-switch.git"
+    "url": "git://github.com/grover/homebridge-delayed-switch.git"
   },
   "bugs": {
-    "url": "http://github.com/nitaybz/homebridge-delay-switch/issues"
+    "url": "http://github.com/grover/homebridge-delayed-switch/issues"
   },
   "engines": {
     "node": ">=0.12.0",

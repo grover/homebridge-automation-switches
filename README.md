@@ -1,40 +1,73 @@
 
-# "Delay Switches" Plugin
+# Delayed Switch Platform
+
+A platform that provides configurable, auto reseting delayed switches. This platform can
+be created to provide time delayed responses in HomeKit rules.
+
+## Why do we need this plugin?
+
+HomeKit (as of iOS 11.1) does not provide a capability to delay the execution of rules. This platform provides delayed switches that can be
+used to build a set of rules that are delayed in execution by the
+run time duration of the switch.
+
+In addition to the basic delay functionality, the delay itself can also
+be modified in rules to change the delay duration depending on external
+factors.
+
+## Installation instructions
+
+After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
+
+ ```sudo npm install -g homebridge-delay-switch```
 
 ## Example config.json:
 
  ```
-    "accessories": [
+{
+  "bridge": {
+      ...
+  },
+  "platforms": [
+    {
+      "platform": "DelayedSwitches",
+      "switches": [
         {
-          "accessory": "DelaySwitch",
-          "name": "DelaySwitch",
-          "delay": 5000
-        }   
-    ]
-
+          "name": "Delayed Switch #1",
+          "defaultDelay": 1800
+        }
+      ]
+    }
+  ]
+}
 ```
 
-## Why do we need this plugin?
+The platform can provide any number of switches that have to be predefined in the homebridge config.json. Each switch supports the following attributes:
 
-With this plugin, you can create any number of fake switches that will do nothing when turned on (and will automatically turn off after the delay time set in the config, simulating a stateless switch). This can be very useful for advanced automation with HomeKit scenes - when a delayed action is required.
+| Attributes | Usage |
+|------------|-------|
+| name | A unique name for the switch. Will be used as the accessory name. |
+| defaultDelay | The default delay of the switch in seconds. |
 
-For example, when using smart wall switch (to turn on) and RGB light bulb (to switch color) together on the same scene can cause no action on the bulb since the bulb might not even be on when the command has been sent from homebridge.
+## Accessory Services
 
-I'm using RF wall switches and a MiLight RGBW bulbs with that switch. When coming home, I wish to turn on the switch and change the color of the bulb, using it on the same scene (or even another scene connected with dummy switch) causing the RGB bulb not to change cause the command is faster than the bulb actually turning on.
-therefore, a delay switch is needed.
+Each delayed switch will expose two services:
 
-Also it can be use with any device that require a certain delay time from other devices (TV + RPi-Kodi  /  PC + SSH / etc...)
+* Accessory Information Service
+* Switch Service
 
-## How it works
+## Accessory Switch Service Characteristics
 
-Basically, all you need to do is:
-1. Set the desired delay time in the config file (in milliseconds).
-2. Use this switch in any scene or automation.
-3. Set an automation to trigger when this switch is turned off - "EVE" app is very recommended to set this automation.
+The exposed switch service supports the following characteristics:
 
-## How to install
+| Characteristic | UUID | Permissions | Usage |
+|---|---|---|---|
+| On | `00000025-0000-1000-8000-0026BB765291` | READ, WRITE, NOTIFY | Enables the delayed switch. After the delay expires this characteristic will be switched off. |
+| Delay | `B469181F-D796-46B4-8D99-5FBE4BA9DC9C` | READ, WRITE, NOTIFY | The delay of the switch in seconds. This value can be changed between 1s and 3600s. A change will only take effect the next time the switch is turned on. |
 
- ```sudo npm install -g homebridge-delay-switch```
- 
+## Supported clients
+
+This platform and the delayed switches it creates have been verified to work with the Elgato Eve app.
+
 ## Credits
-This plugin was forked from and inspired by homebridge-dummy by @nfarina
+
+This plugin was initially forked from and inspired by [homebridge-delay-switch](https://github.com/nitaybz/homebridge-delay-switch) by @nitaybz
