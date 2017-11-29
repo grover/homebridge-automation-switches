@@ -1,6 +1,6 @@
 {
   "name": "homebridge-delayed-switches",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "A platform for delayed switches for HomeKit via Homebridge",
   "license": "ISC",
   "main": "src/index.js",

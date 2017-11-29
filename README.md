@@ -18,7 +18,7 @@ factors.
 
 After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
 
- ```sudo npm install -g homebridge-delay-switch```
+ ```sudo npm install -g homebridge-delayed-switches```
 
 ## Example config.json:
 
