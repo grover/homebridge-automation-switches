@@ -23,7 +23,6 @@ class DelayedSwitchAccessory {
     const services = [];
 
     this.log(`Adding ${this.name}`);
-    this.log(this);
 
     services.push(this.getAccessoryInformationService());
     services.push(this._service = this.getDelayedSwitchService());

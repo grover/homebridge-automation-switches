@@ -7,8 +7,8 @@ const HOMEBRIDGE = {
   UUIDGen: null
 };
 
-const platformName = 'DelayedSwitches';
-const platformPrettyName = 'Delayed Switches Platform';
+const platformName = 'homebridge-delayed-switches';
+const platformPrettyName = 'DelayedSwitches';
 
 module.exports = (homebridge) => {
   HOMEBRIDGE.Accessory = homebridge.platformAccessory;
@@ -22,11 +22,9 @@ module.exports = (homebridge) => {
 const DelayedSwitchPlatform = class {
   constructor(log, config, api) {
     this.log = log;
-    this.log('DelayedSwitchPlatform Platform Plugin Loaded');
+    this.log('Delayed Switches Platform Plugin Loaded');
     this.config = config;
     this.api = api;
-
-    this.log(this);
   }
 
   accessories(callback) {
