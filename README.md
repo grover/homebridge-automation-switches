@@ -1,24 +1,20 @@
 
-# Delayed Switch Platform
+# Automation Switches Platform
 
-A platform that provides configurable, auto reseting delayed switches. This platform can
-be created to provide time delayed responses in HomeKit rules.
+A platform that provides configurable switches for automation purposes. This platform can be created to provide time delayed responses in HomeKit rules. Each switch provides a regular switch, a motion sensor and a configuration service. Activating the switch starts a timer, which will trigger the motion sensor for 1s when the timer elapses. This can be used as a trigger for HomeKit rules.
+
+The switch support two modes: An automatic shut off mode, where the motion sensor will only be tripped once and the switch is automatically shut off. The other mode is a repeating mode, where the motion sensor will be tripped repeatedly until the switch is shut off again.
 
 ## Why do we need this plugin?
 
-HomeKit (as of iOS 11.1) does not provide a capability to delay the execution of rules. This platform provides delayed switches that can be
-used to build a set of rules that are delayed in execution by the
-run time duration of the switch.
-
-In addition to the basic delay functionality, the delay itself can also
-be modified in rules to change the delay duration depending on external
-factors.
+HomeKit (as of iOS 11.1) does not provide a capability to delay the execution of rules. This platform provides switches that can be
+used to build a set of rules that are delayed in execution by a configurable period of time on each switch. The period as well as the repetetiveness and the response can be configured via HomeKit (while the configuration provides sane defaults) and can also be changed in response to rules.
 
 ## Installation instructions
 
 After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
 
- ```sudo npm install -g homebridge-delayed-switches```
+ ```sudo npm install -g homebridge-automation-switches```
 
 ## Example config.json:
 
@@ -29,11 +25,12 @@ After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
   },
   "platforms": [
     {
-      "platform": "DelayedSwitches",
+      "platform": "AutomationSwitches",
       "switches": [
         {
-          "name": "Delayed Switch #1",
-          "defaultDelay": 1800
+          "name": "Automation Switch #1",
+          "period": 1800
+          "autoOff": false
         }
       ]
     }
@@ -46,27 +43,37 @@ The platform can provide any number of switches that have to be predefined in th
 | Attributes | Usage |
 |------------|-------|
 | name | A unique name for the switch. Will be used as the accessory name. |
-| defaultDelay | The default delay of the switch in seconds. |
+| period | The default delay of the switch in seconds. |
+| autoOff | Determines if the switch automatically shuts off after the period has elapsed. |
+
+
 
 ## Accessory Services
 
-Each delayed switch will expose two services:
+Each delayed switch will expose four services:
 
 * Accessory Information Service
 * Switch Service
+* Motion Sensor Service
+* Switch Program Service
 
-## Accessory Switch Service Characteristics
+## Switch Program Service Characteristics
 
 The exposed switch service supports the following characteristics:
 
 | Characteristic | UUID | Permissions | Usage |
 |---|---|---|---|
-| On | `00000025-0000-1000-8000-0026BB765291` | READ, WRITE, NOTIFY | Enables the delayed switch. After the delay expires this characteristic will be switched off. |
-| Delay | `B469181F-D796-46B4-8D99-5FBE4BA9DC9C` | READ, WRITE, NOTIFY | The delay of the switch in seconds. This value can be changed between 1s and 3600s. A change will only take effect the next time the switch is turned on. |
+| Period | `B469181F-D796-46B4-8D99-5FBE4BA9DC9C` | READ, WRITE | The period of the switch in seconds. This value can be changed between 1s and 3600s. A change will only take effect the next time the switch is turned on. |
+| AutomaticOff | `72227266-CA42-4442-AB84-0A7D55A0F08D` | READ, WRITE | Determines if the switch is shut off after the period has elapsed. If the switch is not automatically shut off, the timer will be restarted and the motion sensor will be triggered again until the switch is shut off externally. |
+
+See [HomeKitTypes.js](src/HomeKitTypes.js) for details.
 
 ## Supported clients
 
-This platform and the delayed switches it creates have been verified to work with the Elgato Eve app.
+This platform and the delayed switches it creates have been verified to work with the following apps on iOS 11
+
+* Home
+* Elgato Eve
 
 ## Credits
 
