@@ -1,19 +1,25 @@
 {
-  "name": "homebridge-delayed-switches",
-  "version": "0.8.1",
-  "description": "A platform for delayed switches for HomeKit via Homebridge",
-  "license": "ISC",
+  "name": "homebridge-automation-switches",
+  "author": {
+    "name": "Michael Froehlich"
+  },
+  "version": "1.0.0",
+  "description": "A platform for automation switches for HomeKit via Homebridge",
+  "license": "MIT",
   "main": "src/index.js",
   "keywords": [
     "homebridge-plugin",
-    "delay"
+    "automation",
+    "periodic",
+    "switch",
+    "switches"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/grover/homebridge-delayed-switches.git"
+    "url": "git://github.com/grover/homebridge-automation-switches.git"
   },
   "bugs": {
-    "url": "http://github.com/grover/homebridge-delayed-switches/issues"
+    "url": "http://github.com/grover/homebridge-automation-switches/issues"
   },
   "engines": {
     "node": ">=0.12.0",
