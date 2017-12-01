@@ -1,4 +1,8 @@
-const DelayedSwitchAccessory = require('./DelayedSwitchAccessory.js');
+const version = require('../package.json').version;
+const SwitchAccessory = require('./SwitchAccessory');
+
+const HomeKitTypes = require('./HomeKitTypes');
+
 
 const HOMEBRIDGE = {
   Accessory: null,
@@ -7,8 +11,8 @@ const HOMEBRIDGE = {
   UUIDGen: null
 };
 
-const platformName = 'homebridge-delayed-switches';
-const platformPrettyName = 'DelayedSwitches';
+const platformName = 'homebridge-switches';
+const platformPrettyName = 'AutomationSwitches';
 
 module.exports = (homebridge) => {
   HOMEBRIDGE.Accessory = homebridge.platformAccessory;
@@ -16,15 +20,17 @@ module.exports = (homebridge) => {
   HOMEBRIDGE.Characteristic = homebridge.hap.Characteristic;
   HOMEBRIDGE.UUIDGen = homebridge.hap.uuid;
 
-  homebridge.registerPlatform(platformName, platformPrettyName, DelayedSwitchPlatform, true);
+  homebridge.registerPlatform(platformName, platformPrettyName, AutomationSwitchesPlatform, true);
 }
 
-const DelayedSwitchPlatform = class {
+const AutomationSwitchesPlatform = class {
   constructor(log, config, api) {
     this.log = log;
-    this.log('Delayed Switches Platform Plugin Loaded');
+    this.log('AutomationSwitchesPlatform Plugin Loaded');
     this.config = config;
     this.api = api;
+
+    HomeKitTypes.registerWith(api.hap);
   }
 
   accessories(callback) {
@@ -32,9 +38,14 @@ const DelayedSwitchPlatform = class {
     const { switches } = this.config;
 
     switches.forEach(sw => {
-      this.log(`Found switch in config: "${sw.name}"`);
+      this.log(`Found automation switch in config: "${sw.name}"`);
 
-      let switchAccessory = new DelayedSwitchAccessory(this.api.hap, this.log, sw);
+      // Make sure minimal configuration is set
+      sw.autoOff = sw.autoOff || true;
+      sw.period = sw.period || 60;
+      sw.version = version;
+
+      const switchAccessory = new SwitchAccessory(this.api.hap, this.log, sw);
       _accessories.push(switchAccessory);
     });
 
