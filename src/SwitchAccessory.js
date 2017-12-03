@@ -17,8 +17,8 @@ class SwitchAccessory {
     this.version = config.version;
     this.category = Accessory.Categories.SWITCH;
 
-    this._periodInSeconds = config.period || 5000;
-    this._autoOff = typeof config.autoOff !== "undefined" ? config.autoOff : true;
+    this._periodInSeconds = config.period;
+    this._autoOff = config.autoOff;
 
     this._services = this.createServices();
     this._timer = undefined;

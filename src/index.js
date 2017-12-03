@@ -41,7 +41,7 @@ const AutomationSwitchesPlatform = class {
       this.log(`Found automation switch in config: "${sw.name}"`);
 
       // Make sure minimal configuration is set
-      sw.autoOff = sw.autoOff || true;
+      sw.autoOff = typeof sw.autoOff !== "undefined" ? sw.autoOff : true;
       sw.period = sw.period || 60;
       sw.version = version;
 
