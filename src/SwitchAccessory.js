@@ -22,8 +22,6 @@ class SwitchAccessory {
 
     this._services = this.createServices();
     this._timer = undefined;
-
-    log(this);
   }
 
   getServices() {

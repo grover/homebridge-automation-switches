@@ -29,7 +29,7 @@ After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
       "switches": [
         {
           "name": "Automation Switch #1",
-          "period": 1800
+          "period": 1800,
           "autoOff": false
         }
       ]
