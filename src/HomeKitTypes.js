@@ -47,5 +47,18 @@ module.exports = {
     };
     inherits(Service.SwitchProgram, Service);
     Service.SwitchProgram.UUID = 'FD92B7CF-A343-4D7E-9467-FD251E22C374';
+
+    Characteristic.AlarmTrigger = function () {
+      Characteristic.call(this, 'Alarm', '08910266-98CB-4CC1-A28F-7C5DF64AD92B');
+
+      this.setProps({
+        format: Characteristic.Formats.BOOL,
+        perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE, Characteristic.Perms.EVENTS]
+      });
+
+      this.value = this.getDefaultValue();
+    };
+    inherits(Characteristic.AlarmTrigger, Characteristic);
+    Characteristic.AlarmTrigger.UUID = '08910266-98CB-4CC1-A28F-7C5DF64AD92B';
   }
 }

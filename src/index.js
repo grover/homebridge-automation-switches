@@ -1,5 +1,9 @@
+
+const util = require('util');
+
 const version = require('../package.json').version;
 const SwitchAccessory = require('./SwitchAccessory');
+const SecuritySystemAccessory = require('./SecuritySystemAccessory');
 
 const HomeKitTypes = require('./HomeKitTypes');
 
@@ -31,6 +35,11 @@ const AutomationSwitchesPlatform = class {
     this.api = api;
 
     HomeKitTypes.registerWith(api.hap);
+
+    this._factories = {
+      automation: this._createAutomationSwitch.bind(this),
+      security: this._createSecuritySwitch.bind(this)
+    };
   }
 
   accessories(callback) {
@@ -39,16 +48,39 @@ const AutomationSwitchesPlatform = class {
 
     switches.forEach(sw => {
       this.log(`Found automation switch in config: "${sw.name}"`);
+      if (sw.name === undefined || sw.name.length === 0) {
+        throw new Error('Invalid configuration: Automation switch name is invalid.');
+      }
 
-      // Make sure minimal configuration is set
-      sw.autoOff = typeof sw.autoOff !== "undefined" ? sw.autoOff : true;
-      sw.period = sw.period || 60;
-      sw.version = version;
+      if (sw.type === undefined) {
+        sw.type = 'automation';
+      }
 
-      const switchAccessory = new SwitchAccessory(this.api.hap, this.log, sw);
-      _accessories.push(switchAccessory);
+      const factory = this._factories[sw.type];
+      if (factory === undefined) {
+        this.log(`Invalid automation switch - type is unknown: ${util.inspect(sw)}`);
+        this.log('Skipping.');
+        return;
+      }
+
+      const accessory = factory(sw);
+      _accessories.push(accessory);
     });
 
     callback(_accessories);
+  }
+
+  _createAutomationSwitch(sw) {
+    // Make sure minimal configuration is set
+    sw.autoOff = typeof sw.autoOff !== "undefined" ? sw.autoOff : true;
+    sw.period = sw.period || 60;
+    sw.version = version;
+
+    return new SwitchAccessory(this.api, this.log, sw);
+  }
+
+  _createSecuritySwitch(sw) {
+    sw.version = version;
+    return new SecuritySystemAccessory(this.api, this.log, sw);
   }
 }

@@ -7,10 +7,10 @@ var Accessory, Characteristic, Service;
 
 class SwitchAccessory {
 
-  constructor(homebridge, log, config) {
-    Accessory = homebridge.Accessory;
-    Characteristic = homebridge.Characteristic;
-    Service = homebridge.Service;
+  constructor(api, log, config) {
+    Accessory = api.hap.Accessory;
+    Characteristic = api.hap.Characteristic;
+    Service = api.hap.Service;
 
     this.log = log;
     this.name = config.name;

@@ -24,5 +24,11 @@
   "engines": {
     "node": ">=0.12.0",
     "homebridge": ">=0.2.0"
+  },
+  "dependencies": {
+    "node-persist": "^0.0.8"
+  },
+  "devDependencies": {
+    "npm-github-release": "^0.9.0"
   }
 }
