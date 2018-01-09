@@ -1,13 +1,14 @@
 "use strict";
 
 const version = require('../package.json').version;
+const clone = require('clone');
+const inherits = require('util').inherits;
 
-var inherits = require('util').inherits;
-var Accessory, Characteristic, Service;
+let Accessory, Characteristic, Service;
 
 class SwitchAccessory {
 
-  constructor(api, log, config) {
+  constructor(api, log, config, storage) {
     Accessory = api.hap.Accessory;
     Characteristic = api.hap.Characteristic;
     Service = api.hap.Service;
@@ -20,8 +21,25 @@ class SwitchAccessory {
     this._periodInSeconds = config.period;
     this._autoOff = config.autoOff;
 
+    this._storage = storage;
+
+    const defaultValue = {
+      autoOff: config.autoOff,
+      period: config.period,
+      state: config.default === undefined ? false : config.default
+    };
+
+    storage.retrieve(defaultValue, (error, value) => {
+      this._state = value;
+    });
+
+
     this._services = this.createServices();
     this._timer = undefined;
+
+    if (this._state.state) {
+      this._startTimer();
+    }
   }
 
   getServices() {
@@ -60,7 +78,8 @@ class SwitchAccessory {
     const switchSvc = new Service.Switch(this.name);
     switchSvc.getCharacteristic(Characteristic.On)
       .on('set', this._setOn.bind(this))
-      .on('get', this._getOn.bind(this));
+      .updateValue(this._state.state);
+
     return switchSvc;
   }
 
@@ -68,10 +87,12 @@ class SwitchAccessory {
     const program = new Service.SwitchProgram(this.name);
     program.getCharacteristic(Characteristic.PeriodInSeconds)
       .on('set', this._setPeriod.bind(this))
-      .on('get', this._getPeriod.bind(this));
+      .updateValue(this._state.period);
+
     program.getCharacteristic(Characteristic.AutomaticOff)
       .on('set', this._setAutoOff.bind(this))
-      .on('get', this._getAutoOff.bind(this));
+      .updateValue(this._state.autoOff);
+
     return program;
   }
 
@@ -88,38 +109,39 @@ class SwitchAccessory {
     this.log("Setting switch state to " + on);
 
     this._resetTimer();
-    if (on) {
+
+    const data = clone(this._state);
+    data.state = on;
+
+    this._persist(data, (error) => {
+      if (error) {
+        this.log('Storing the state change has failed.');
+        callback(error);
+        return;
+      }
+
       this._startTimer();
-    }
+    });
 
     callback();
-  }
-
-  _getOn(callback) {
-    this.log("Returning current power status value: s=" + (this._timer !== undefined));
-    callback(undefined, this._timer !== undefined);
   }
 
   _setPeriod(value, callback) {
     this.log("Setting period value: d=" + value + "s");
-    this._periodInSeconds = value;
-    callback();
-  }
 
-  _getPeriod(callback) {
-    this.log("Returning current period value: d=" + this._periodInSeconds + "s");
-    callback(undefined, this._periodInSeconds);
+    const data = clone(this._state);
+    data.period = value;
+
+    this._persist(data, callback);
   }
 
   _setAutoOff(value, callback) {
     this.log("Setting auto off value " + value);
-    this._autoOff = value;
-    callback();
-  }
 
-  _getAutoOff(callback) {
-    this.log("Returning current auto off value " + this._autoOff);
-    callback(undefined, this._autoOff);
+    const data = clone(this._state);
+    data.autoOff = value;
+
+    this._persist(data, callback);
   }
 
   _startTimer() {
@@ -164,6 +186,18 @@ class SwitchAccessory {
     if (!this._autoOff) {
       this._startTimer();
     }
+  }
+
+  _persist(data, callback) {
+    this._storage.store(data, (error) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+
+      this._state = data;
+      callback();
+    });
   }
 }
 

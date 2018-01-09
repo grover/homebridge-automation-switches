@@ -1,11 +1,8 @@
 "use strict";
 
 const version = require('../package.json').version;
-const securitySystemStorage = require('node-persist').create();
-
+const clone = require('clone');
 const inherits = require('util').inherits;
-
-const NameFactory = require('./util/NameFactory');
 
 let Accessory, Characteristic, Service;
 
@@ -19,7 +16,7 @@ const SecuritySystemStates = [
 
 class SecuritySystemAccessory {
 
-  constructor(api, log, config) {
+  constructor(api, log, config, storage) {
     Accessory = api.hap.Accessory;
     Characteristic = api.hap.Characteristic;
     Service = api.hap.Service;
@@ -28,15 +25,30 @@ class SecuritySystemAccessory {
     this.name = config.name;
     this.version = config.version;
 
-    this._persistKey = `SecuritySystem.${NameFactory.generate(this.name)}.json`;
+    this._storage = storage;
 
-    securitySystemStorage.initSync({ dir: api.user.persistPath() });
-    this._state = securitySystemStorage.getItemSync(this._persistKey) || {
-      targetState: Characteristic.SecuritySystemCurrentState.DISARMED,
+    const defaultValue = {
+      targetState: this._pickDefault(config.default),
       alarm: false
     };
 
+    storage.retrieve(defaultValue, (error, value) => {
+      this._state = value;
+    });
+
     this._services = this.createServices();
+  }
+
+  _pickDefault(value) {
+    switch (value) {
+      case 'armed-stay': return 0;
+      case 'armed-away': return 1;
+      case 'armed-night': return 2;
+      case 'unarmed': return 3;
+      case undefined: return 3;
+    }
+
+    throw new Error('Unsupported default value in configuration of security system.');
   }
 
   getServices() {
@@ -94,32 +106,30 @@ class SecuritySystemAccessory {
 
   _setState(value, callback) {
     this.log(`Change target state of ${this.name} to ${SecuritySystemStates[value]}`);
-    this._state.targetState = value;
-    this._persist(callback);
+
+    const data = clone(this._state);
+    data.targetState = value;
+    this._persist(data, callback);
   }
 
   _setAlarm(value, callback) {
     this.log(`Change alarm state of ${this.name} to ${value}`);
-    this._state.alarm = value;
-    this._persist(callback);
+
+    const data = clone(this._state);
+    data.alarm = value;
+    this._persist(data, callback);
   }
 
-  _persist(callback) {
-    securitySystemStorage.setItem(this._persistKey, this._state, (error, result) => {
+  _persist(data, callback) {
+    this._storage.store(data, (error) => {
       if (error) {
         callback(error);
         return;
       }
 
-      securitySystemStorage.persistKey(this._persistKey, (error) => {
-        if (error) {
-          callback(error);
-          return;
-        }
-
-        this._updateCurrentState();
-        callback();
-      });
+      this._state = data;
+      this._updateCurrentState();
+      callback();
     });
   }
 

@@ -1,6 +1,7 @@
 "use strict";
 
 const version = require('../package.json').version;
+const clone = require('clone');
 const inherits = require('util').inherits;
 
 const NameFactory = require('./util/NameFactory');
@@ -17,7 +18,7 @@ const LockMechanismStates = [
 
 class LockMechanismAccessory {
 
-  constructor(api, log, config) {
+  constructor(api, log, config, storage) {
     Accessory = api.hap.Accessory;
     Characteristic = api.hap.Characteristic;
     Service = api.hap.Service;
@@ -26,11 +27,29 @@ class LockMechanismAccessory {
     this.name = config.name;
     this.version = config.version;
 
-    this._state = {
-      targetState: Characteristic.LockTargetState.UNSECURED
+    this._storage = storage;
+
+    const defaultValue = {
+      targetState: this._pickDefault(config.default)
     };
 
+    storage.retrieve(defaultValue, (error, value) => {
+      this._state = value;
+    });
+
     this._services = this.createServices();
+  }
+
+  _pickDefault(value) {
+    if (value === 'locked') {
+      return 1;
+    }
+
+    if (value === 'unlocked' || value === undefined) {
+      return 0;
+    }
+
+    throw new Error('Unsupported default value in configuration of lock.');
   }
 
   getServices() {
@@ -84,9 +103,20 @@ class LockMechanismAccessory {
 
   _setTargetState(value, callback) {
     this.log(`Change target state of ${this.name} to ${LockMechanismStates[value]}`);
-    this._state.targetState = value;
-    this._updateCurrentState();
-    callback();
+
+    const data = clone(this._state);
+    data.targetState = value;
+
+    this._persist(data, (error) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+
+      this._state = data;
+      this._updateCurrentState();
+      callback();
+    });
   }
 
   _updateCurrentState() {
@@ -95,6 +125,18 @@ class LockMechanismAccessory {
     this._lockMechanismService
       .getCharacteristic(Characteristic.LockCurrentState)
       .updateValue(currentState);
+  }
+
+  _persist(data, callback) {
+    this._storage.store(data, (error) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+
+      this._state = data;
+      callback();
+    });
   }
 }
 

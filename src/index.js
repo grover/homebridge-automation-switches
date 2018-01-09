@@ -8,6 +8,9 @@ const SecuritySystemAccessory = require('./SecuritySystemAccessory');
 const LockMechanismAccessory = require('./LockMechanismAccessory');
 const SwitchAccessory = require('./SwitchAccessory');
 
+const StorageWrapper = require('./util/StorageWrapper');
+const FakeStorageWrapper = require('./util/FakeStorageWrapper');
+
 const HomeKitTypes = require('./HomeKitTypes');
 
 
@@ -70,34 +73,58 @@ const AutomationSwitchesPlatform = class {
         return;
       }
 
-      const accessory = factory(sw);
+      const storage = this._createStorage(sw);
+
+      const accessory = factory(sw, storage);
       _accessories.push(accessory);
     });
 
     callback(_accessories);
   }
 
-  _createAutomationSwitch(sw) {
+  _createStorage(sw) {
+    if (this._shouldStoreSwitchState(sw)) {
+      const type = this._sanitizeTypeForStorage(sw.type);
+      return new StorageWrapper(this.api, type, sw.name);
+    }
+
+    return new FakeStorageWrapper();
+  }
+
+  _shouldStoreSwitchState(sw) {
+    return sw.stored === true
+      || (sw.type === 'security' && sw.stored !== false);
+  }
+
+  _sanitizeTypeForStorage(type) {
+    if (type === 'security') {
+      type = 'SecuritySystem';
+    }
+
+    return type;
+  }
+
+  _createAutomationSwitch(sw, storage) {
     // Make sure minimal configuration is set
     sw.autoOff = typeof sw.autoOff !== "undefined" ? sw.autoOff : true;
     sw.period = sw.period || 60;
     sw.version = version;
 
-    return new AutomationSwitchAccessory(this.api, this.log, sw);
+    return new AutomationSwitchAccessory(this.api, this.log, sw, storage);
   }
 
-  _createSecuritySwitch(sw) {
+  _createSecuritySwitch(sw, storage) {
     sw.version = version;
-    return new SecuritySystemAccessory(this.api, this.log, sw);
+    return new SecuritySystemAccessory(this.api, this.log, sw, storage);
   }
 
-  _createLockMechanism(sw) {
+  _createLockMechanism(sw, storage) {
     sw.version = version;
-    return new LockMechanismAccessory(this.api, this.log, sw);
+    return new LockMechanismAccessory(this.api, this.log, sw, storage);
   }
 
-  _createSwitch(sw) {
+  _createSwitch(sw, storage) {
     sw.version = version;
-    return new SwitchAccessory(this.api, this.log, sw);
+    return new SwitchAccessory(this.api, this.log, sw, storage);
   }
 }

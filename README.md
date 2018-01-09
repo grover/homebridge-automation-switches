@@ -1,14 +1,16 @@
 
 # Automation Switches Platform
 
-A platform that provides configurable switches for automation purposes. This platform can be created to provide time delayed responses in HomeKit rules or to simulate security systems. 
+A platform that provides configurable switches for automation purposes. This platform can be created to provide time delayed responses in HomeKit rules or to simulate security systems.
 
 ## Why do we need this plugin?
 
-HomeKit (as of iOS 11.1) does not provide a capability to delay the execution of rules. This platform provides switches that can be used to build a set of rules that are delayed in execution by a configurable period of time on each switch. The period as well as the repetetiveness and the response can be configured via HomeKit (while the configuration provides sane defaults) and can also be changed in response to rules.
+This platform provides software based, optionally persistent, switches to create DIY HomeKit solutions.
+Each switch has specific purposes that are illustrated in their respective documents linked below.
 
-The security system switches enable an easier creation of home alarm systems using already available
-accessories.
+The plugin provides four different types of switches: A basic on/off switch, a lock mechanism, an automation switch with advanced properties and a security system. All of them are configured ahead
+of their use through the configuration file and each one of them potentially saves their state to storage
+to keep their state even across crashes, reboots and such.
 
 ## Installation instructions
 
@@ -18,7 +20,7 @@ After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
 
 ## Example config.json:
 
- ```
+```json
 {
   "bridge": {
       ...
@@ -45,61 +47,30 @@ After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
 
 The platform can provide any number of switches that have to be predefined in the homebridge config.json.
 
-### Automation Switch Type
+### Switch types
 
-Each automation switch provides a regular switch, a motion sensor and a configuration service. Activating the switch starts a timer, which will trigger the motion sensor for 1s when the timer elapses. This can be used as a trigger for HomeKit rules.
+Please see the documentation for each type of switch this plugin is able to create:
 
-The switch support two modes: An automatic shut off mode, where the motion sensor will only be tripped once and the switch is automatically shut off. The other mode is a repeating mode, where the motion sensor will be tripped repeatedly until the switch is shut off again.
+- [Automation switch](docs/AutomationSwitch.md)
+- [Lock mechanism](docs/LockMechanism.md)
+- [Security system](docs/SecuritySystem.md)
+- [Switch](docs/Switch.md)
 
-| Attributes | Required | Usage |
-|------------|----------|-------|
-| type | No | If not set, creates an "automation" switch. If specified, this must be "automation" for automation switches. |
-| name | Yes | A unique name for the switch. Will be used as the accessory name. |
-| period | Yes | The default delay of the switch in seconds. |
-| autoOff | Yes | Determines if the switch automatically shuts off after the period has elapsed. |
+An advanced configuration example containing all four switch types can be found [here](docs/Configuration.md).
 
-### Security System Switch Type
+### Storage
 
-The security system switch type enables the creation of security systems. The switch can be armed in night, away and stay modes. Additionally there's an option to trigger an alarm using an On/Off characteristic.
+Every type of switch is able to store every state change to disk. This is useful if homebridge is restarted for whatever reason: The switches created by this plugin will retain the state they had before the restart.
 
-The value of the characteristics is persisted if homebridge is restarted.
+For that the switches create individual files in the persist subfolder of your homebridge configuration folder.
 
-| Attributes | Required | Usage |
-|------------|----------|-------|
-| type | Yes | Must be set to "security" for this type of switch. |
-| name | Yes | A unique name for the switch. Will be used as the accessory name. |
+## Developer Information
 
-The settings of this switch are persisted to files in the homebridge configuration folder in the persist subfolder.
-
-## Accessory Services
-
-Each automation switch will expose four services:
-
-* Accessory Information Service
-* Switch Service
-* Motion Sensor Service
-* Switch Program Service
-
-Each security switch will expose the following service:
-
-* Accessory Information Service
-* Security System Service
-
-## Switch Program Service Characteristics
-
-The exposed switch service supports the following characteristics:
-
-| Characteristic | UUID | Permissions | Usage |
-|---|---|---|---|
-| Period | `B469181F-D796-46B4-8D99-5FBE4BA9DC9C` | READ, WRITE | The period of the switch in seconds. This value can be changed between 1s and 3600s. A change will only take effect the next time the switch is turned on. |
-| AutomaticOff | `72227266-CA42-4442-AB84-0A7D55A0F08D` | READ, WRITE | Determines if the switch is shut off after the period has elapsed. If the switch is not automatically shut off, the timer will be restarted and the motion sensor will be triggered again until the switch is shut off externally. |
-| Alarm | `72227266-CA42-4442-AB84-0A7D55A0F08D` | READ, WRITE, EVENTS | For security switches this characteristic enables the triggering of an alarm. Can also be used for additional rules. |
-
-See [HomeKitTypes.js](src/HomeKitTypes.js) for details.
+There's [documentation](docs/CustomCharacteristics.md) of the custom services and characteristics exposed by the switches.
 
 ## Supported clients
 
-This platform and the delayed switches it creates have been verified to work with the following apps on iOS 11
+This platform and the switches it creates have been verified to work with the following apps on iOS 11:
 
 * Home
 * Elgato Eve
@@ -112,9 +83,7 @@ This plugin was initially forked from and inspired by [homebridge-delay-switch](
 
 If you use this and like it - please leave a note by staring this package here or on GitHub.
 
-If you use it and have a
-problem, file an issue at [GitHub](https://github.com/grover/homebridge-telegram/issues) - I'll try
-to help. 
+If you use it and have a problem, file an issue at [GitHub](https://github.com/grover/homebridge-telegram/issues) - I'll try to help.
 
 If you tried this, but don't like it: tell me about it in an issue too. I'll try my best
 to address these in my spare time.

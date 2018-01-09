@@ -1,11 +1,8 @@
 "use strict";
 
 const version = require('../package.json').version;
-const securitySystemStorage = require('node-persist').create();
-
+const clone = require('clone');
 const inherits = require('util').inherits;
-
-const NameFactory = require('./util/NameFactory');
 
 let Accessory, Characteristic, Service;
 
@@ -16,7 +13,7 @@ const SwitchStates = [
 
 class SwitchAccessory {
 
-  constructor(api, log, config) {
+  constructor(api, log, config, storage) {
     Accessory = api.hap.Accessory;
     Characteristic = api.hap.Characteristic;
     Service = api.hap.Service;
@@ -25,9 +22,15 @@ class SwitchAccessory {
     this.name = config.name;
     this.version = config.version;
 
-    this._state = {
-      state: false
+    this._storage = storage;
+
+    const defaultValue = {
+      state: config.default === undefined ? false : config.default
     };
+
+    storage.retrieve(defaultValue, (error, value) => {
+      this._state = value;
+    });
 
     this._services = this.createServices();
   }
@@ -79,9 +82,24 @@ class SwitchAccessory {
   }
 
   _setState(value, callback) {
-    this.log(`Change target state of ${this.name} to ${SwitchStates[value]}`);
-    this._state.targetState = value;
-    callback();
+    this.log(`Change target state of ${this.name} to ${value}`);
+
+    const data = clone(this._state);
+    data.state = value;
+
+    this._persist(data, callback);
+  }
+
+  _persist(data, callback) {
+    this._storage.store(data, (error) => {
+      if (error) {
+        callback(error);
+        return;
+      }
+
+      this._state = data;
+      callback();
+    });
   }
 }
 
