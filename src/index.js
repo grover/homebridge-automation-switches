@@ -58,6 +58,8 @@ const AutomationSwitchesPlatform = class {
       }
 
       if (sw.type === undefined) {
+        this.log(`Warning: ${sw.name} does not specify a type. Please update your configuration`);
+        this.log(`to include "type": "automation" for ${sw.name} or it'll fail to run in the future.`);
         sw.type = 'automation';
       }
 
