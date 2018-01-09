@@ -1,20 +1,21 @@
 "use strict";
 
 const version = require('../package.json').version;
-const securitySystemStorage = require('node-persist').create();
-
 const inherits = require('util').inherits;
 
 const NameFactory = require('./util/NameFactory');
 
 let Accessory, Characteristic, Service;
 
-const SwitchStates = [
-  'Off',
-  'On'
+const LockMechanismStates = [
+  'Unsecured',
+  'Secured',
+  'Jammed',
+  'Unknown',
+  'Alarm triggered'
 ];
 
-class SwitchAccessory {
+class LockMechanismAccessory {
 
   constructor(api, log, config) {
     Accessory = api.hap.Accessory;
@@ -26,7 +27,7 @@ class SwitchAccessory {
     this.version = config.version;
 
     this._state = {
-      state: false
+      targetState: Characteristic.LockTargetState.UNSECURED
     };
 
     this._services = this.createServices();
@@ -40,7 +41,7 @@ class SwitchAccessory {
     return [
       this.getAccessoryInformationService(),
       this.getBridgingStateService(),
-      this.getSwitchService()
+      this.getLockMechanismService()
     ];
   }
 
@@ -48,8 +49,8 @@ class SwitchAccessory {
     return new Service.AccessoryInformation()
       .setCharacteristic(Characteristic.Name, this.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Michael Froehlich')
-      .setCharacteristic(Characteristic.Model, 'Switch')
-      .setCharacteristic(Characteristic.SerialNumber, '44')
+      .setCharacteristic(Characteristic.Model, 'Lock Mechanism')
+      .setCharacteristic(Characteristic.SerialNumber, '45')
       .setCharacteristic(Characteristic.FirmwareRevision, this.version)
       .setCharacteristic(Characteristic.HardwareRevision, this.version);
   }
@@ -59,18 +60,21 @@ class SwitchAccessory {
       .setCharacteristic(Characteristic.Reachable, true)
       .setCharacteristic(Characteristic.LinkQuality, 4)
       .setCharacteristic(Characteristic.AccessoryIdentifier, this.name)
-      .setCharacteristic(Characteristic.Category, Accessory.Categories.SWITCH);
+      .setCharacteristic(Characteristic.Category, Accessory.Categories.DOOR_LOCK);
   }
 
-  getSwitchService() {
-    this._switchService = new Service.Switch(this.name);
-    this._switchService.getCharacteristic(Characteristic.On)
-      .on('set', this._setState.bind(this))
-      .updateValue(this._state.state);
+  getLockMechanismService() {
+    this._lockMechanismService = new Service.LockMechanism(this.name);
+    this._lockMechanismService.getCharacteristic(Characteristic.LockTargetState)
+      .on('set', this._setTargetState.bind(this))
+      .updateValue(this._state.targetState);
 
-    this._switchService.isPrimaryService = true;
+    this._lockMechanismService.getCharacteristic(Characteristic.LockCurrentState)
+      .updateValue(this._state.targetState);
 
-    return this._switchService;
+    this._lockMechanismService.isPrimaryService = true;
+
+    return this._lockMechanismService;
   }
 
   identify(callback) {
@@ -78,11 +82,20 @@ class SwitchAccessory {
     callback();
   }
 
-  _setState(value, callback) {
-    this.log(`Change target state of ${this.name} to ${SwitchStates[value]}`);
+  _setTargetState(value, callback) {
+    this.log(`Change target state of ${this.name} to ${LockMechanismStates[value]}`);
     this._state.targetState = value;
+    this._updateCurrentState();
     callback();
+  }
+
+  _updateCurrentState() {
+    let currentState = this._state.targetState;
+
+    this._lockMechanismService
+      .getCharacteristic(Characteristic.LockCurrentState)
+      .updateValue(currentState);
   }
 }
 
-module.exports = SwitchAccessory;
+module.exports = LockMechanismAccessory;

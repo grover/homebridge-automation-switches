@@ -2,8 +2,11 @@
 const util = require('util');
 
 const version = require('../package.json').version;
-const SwitchAccessory = require('./SwitchAccessory');
+
+const AutomationSwitchAccessory = require('./AutomationSwitchAccessory');
 const SecuritySystemAccessory = require('./SecuritySystemAccessory');
+const LockMechanismAccessory = require('./LockMechanismAccessory');
+const SwitchAccessory = require('./SwitchAccessory');
 
 const HomeKitTypes = require('./HomeKitTypes');
 
@@ -38,7 +41,9 @@ const AutomationSwitchesPlatform = class {
 
     this._factories = {
       automation: this._createAutomationSwitch.bind(this),
-      security: this._createSecuritySwitch.bind(this)
+      lock: this._createLockMechanism.bind(this),
+      security: this._createSecuritySwitch.bind(this),
+      switch: this._createSwitch.bind(this)
     };
   }
 
@@ -76,11 +81,21 @@ const AutomationSwitchesPlatform = class {
     sw.period = sw.period || 60;
     sw.version = version;
 
-    return new SwitchAccessory(this.api, this.log, sw);
+    return new AutomationSwitchAccessory(this.api, this.log, sw);
   }
 
   _createSecuritySwitch(sw) {
     sw.version = version;
     return new SecuritySystemAccessory(this.api, this.log, sw);
+  }
+
+  _createLockMechanism(sw) {
+    sw.version = version;
+    return new LockMechanismAccessory(this.api, this.log, sw);
+  }
+
+  _createSwitch(sw) {
+    sw.version = version;
+    return new SwitchAccessory(this.api, this.log, sw);
   }
 }

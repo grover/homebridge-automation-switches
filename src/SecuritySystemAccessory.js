@@ -27,7 +27,6 @@ class SecuritySystemAccessory {
     this.log = log;
     this.name = config.name;
     this.version = config.version;
-    this.category = Accessory.Categories.SECURITY_SYSTEM;
 
     this._persistKey = `SecuritySystem.${NameFactory.generate(this.name)}.json`;
 
@@ -47,6 +46,7 @@ class SecuritySystemAccessory {
   createServices() {
     return [
       this.getAccessoryInformationService(),
+      this.getBridgingStateService(),
       this.getSecuritySystemService()
     ];
   }
@@ -59,6 +59,14 @@ class SecuritySystemAccessory {
       .setCharacteristic(Characteristic.SerialNumber, '43')
       .setCharacteristic(Characteristic.FirmwareRevision, this.version)
       .setCharacteristic(Characteristic.HardwareRevision, this.version);
+  }
+
+  getBridgingStateService() {
+    return new Service.BridgingState()
+      .setCharacteristic(Characteristic.Reachable, true)
+      .setCharacteristic(Characteristic.LinkQuality, 4)
+      .setCharacteristic(Characteristic.AccessoryIdentifier, this.name)
+      .setCharacteristic(Characteristic.Category, Accessory.Categories.SECURITY_SYSTEM);
   }
 
   getSecuritySystemService() {
