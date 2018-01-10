@@ -56,3 +56,16 @@ An additional use I have for this switch is to integrate with heating solutions 
 HomeKit, by default, enables notifications for security system mechanisms. Once enabled you automatically get built-in notifications for this security system switch too. You can disable these notifications in the Home.app if you do not care for the notifications. To disable/enable the notifications, open the Home app, select the tile that represents the lock and long-press on it, choose Details and scroll down until you get to Notifications. You can disable them there.
 
 There's unfortunately no way to change the notification text in HomeKit. If you're looking for something to send customized notifications I'd recommend one of the [IFTT plugins](https://www.npmjs.com/search?q=homebridge+ifttt) or my [homebridge-telegram](https://www.npmjs.com/packages/homebridge-telegram) plugin (shameless plug.)
+
+## Typical rules for the security system
+
+The following is an example rule for the security system, showing the versatility:
+
+```text
+When motion detected
+And Security System State is Night Arm
+Then Set Alarm to ON
+And Turn on all lights
+```
+
+In essence you can create rules for each of the security system states and respond differently if the alarm happens during the night, when you're at home or away by building appropriate rules for it.
