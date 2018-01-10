@@ -85,7 +85,7 @@ const AutomationSwitchesPlatform = class {
   _createStorage(sw) {
     if (this._shouldStoreSwitchState(sw)) {
       const type = this._sanitizeTypeForStorage(sw.type);
-      return new StorageWrapper(this.api, type, sw.name);
+      return new StorageWrapper(this.api, this.log, type, sw.name);
     }
 
     return new FakeStorageWrapper();
