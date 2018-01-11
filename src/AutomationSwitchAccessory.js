@@ -16,10 +16,6 @@ class SwitchAccessory {
     this.log = log;
     this.name = config.name;
     this.version = config.version;
-    this.category = Accessory.Categories.SWITCH;
-
-    this._periodInSeconds = config.period;
-    this._autoOff = config.autoOff;
 
     this._storage = storage;
 
@@ -75,12 +71,12 @@ class SwitchAccessory {
   }
 
   getSwitchService() {
-    const switchSvc = new Service.Switch(this.name);
-    switchSvc.getCharacteristic(Characteristic.On)
+    this._switchService = new Service.Switch(this.name);
+    this._switchService.getCharacteristic(Characteristic.On)
       .on('set', this._setOn.bind(this))
       .updateValue(this._state.state);
 
-    return switchSvc;
+    return this._switchService;
   }
 
   getSwitchProgramService() {
@@ -97,7 +93,8 @@ class SwitchAccessory {
   }
 
   getMotionSensorService() {
-    return new Service.MotionSensor(this.name);
+    this._motionSensor =  new Service.MotionSensor(this.name);
+    return this._motionSensor;
   }
 
   identify(callback) {
@@ -120,7 +117,9 @@ class SwitchAccessory {
         return;
       }
 
-      this._startTimer();
+      if (on) {
+        this._startTimer();
+      }  
     });
 
     callback();
@@ -145,7 +144,7 @@ class SwitchAccessory {
   }
 
   _startTimer() {
-    const delay = this._periodInSeconds * 1000;
+    const delay = this._state.period * 1000;
 
     this.log("Starting timer for " + delay + "ms");
     this._timer = setTimeout(this._onTimeout.bind(this), delay);
@@ -159,18 +158,28 @@ class SwitchAccessory {
   }
 
   _onTimeout() {
-    this.log("Reseting switch");
     this._timer = undefined;
-
     this.onTimerExpired();
   }
 
   onTimerExpired() {
-    if (this._autoOff) {
+    if (this._state.autoOff) {
       this.log("Reseting switch");
-
-      this._services[1].getCharacteristic(Characteristic.On)
-        .updateValue(false, undefined, undefined);
+      
+      const data = clone(this._state);
+      data.state = false;
+    
+      this._persist(data, (error) => {
+        if (error) {
+          this.log('Storing the state change has failed.');
+          callback(error);
+          return;
+        }
+  
+        this._switchService
+          .getCharacteristic(Characteristic.On)
+          .updateValue(false, undefined, undefined);
+      });      
     }
 
     this.signalMotion(true);
@@ -178,12 +187,14 @@ class SwitchAccessory {
   }
 
   signalMotion(motion) {
-    this._services[3].getCharacteristic(Characteristic.MotionDetected).updateValue(motion, undefined, undefined);
+    this._motionSensor
+      .getCharacteristic(Characteristic.MotionDetected)
+      .updateValue(motion, undefined, undefined);
   }
 
   nextPeriod() {
     this.signalMotion(false);
-    if (!this._autoOff) {
+    if (!this._state.autoOff) {
       this._startTimer();
     }
   }
