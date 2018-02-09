@@ -59,8 +59,18 @@ class SecuritySystemAccessory {
     return [
       this.getAccessoryInformationService(),
       this.getBridgingStateService(),
-      this.getSecuritySystemService()
+      this.getSecuritySystemService(),
+      this.getArmSwitchService(),
     ];
+  }
+
+  getArmSwitchService() {
+    this._armSwitchService = new Service.Switch(`${this.name} Arm`);
+    this._armSwitchService.getCharacteristic(Characteristic.On)
+      .on('set', this._setArm.bind(this))
+      .updateValue(!this._isDisarmed());
+
+    return this._armSwitchService;
   }
 
   getAccessoryInformationService() {
@@ -112,6 +122,21 @@ class SecuritySystemAccessory {
     this._persist(data, callback);
   }
 
+  _setArm(value, callback) {
+    let targetState;
+    if (value) {
+      targetState = Characteristic.SecuritySystemTargetState.AWAY_ARM;
+    } else {
+      targetState = Characteristic.SecuritySystemTargetState.DISARM;
+    }
+
+    this._securitySystemService
+      .getCharacteristic(Characteristic.SecuritySystemTargetState)
+      .updateValue(targetState);
+
+    this._setState(targetState, callback);
+  }
+
   _setAlarm(value, callback) {
     this.log(`Change alarm state of ${this.name} to ${value}`);
 
@@ -133,9 +158,14 @@ class SecuritySystemAccessory {
     });
   }
 
+  _isDisarmed() {
+    let currentState = this._state.targetState;
+    return currentState === Characteristic.SecuritySystemCurrentState.DISARMED;
+  }
+
   _updateCurrentState() {
     let currentState = this._state.targetState;
-    if (this._state.alarm && currentState !== Characteristic.SecuritySystemCurrentState.DISARMED) {
+    if (this._state.alarm && !this._isDisarmed()) {
       currentState = Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED;
     }
 
