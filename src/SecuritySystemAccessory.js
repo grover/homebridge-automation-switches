@@ -24,15 +24,27 @@ class SecuritySystemAccessory {
     this.log = log;
     this.name = config.name;
     this.version = config.version;
+    this.zones = config.zones || ['Alarm'];
 
     this._storage = storage;
 
     const defaultValue = {
       targetState: this._pickDefault(config.default),
-      alarm: false
+      zonesAlarm: {},
     };
 
+    for (let zoneLabel of this.zones) {
+      defaultValue.zonesAlarm[zoneLabel] = false;
+    }
+
     storage.retrieve(defaultValue, (error, value) => {
+      // Remove zones from storage that are not in the list anymore
+      for (let zoneLabel in value.zonesAlarm) {
+        if (this.zones.indexOf(zoneLabel) === -1) {
+          delete value.zonesAlarm[zoneLabel];
+        }
+      }
+
       this._state = value;
     });
 
@@ -61,11 +73,12 @@ class SecuritySystemAccessory {
       this.getBridgingStateService(),
       this.getSecuritySystemService(),
       this.getArmSwitchService(),
+      ...this.getZoneServices(),
     ];
   }
 
   getArmSwitchService() {
-    this._armSwitchService = new Service.Switch(`${this.name} Arm`);
+    this._armSwitchService = new Service.Switch(`${this.name} Arm`, 'arm');
     this._armSwitchService.getCharacteristic(Characteristic.On)
       .on('set', this._setArm.bind(this))
       .updateValue(!this._isDisarmed());
@@ -100,13 +113,25 @@ class SecuritySystemAccessory {
     this._securitySystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState)
       .updateValue(this._state.targetState);
 
-    this._securitySystemService.addCharacteristic(Characteristic.AlarmTrigger)
-      .on('set', this._setAlarm.bind(this))
-      .updateValue(this._state.alarm);
-
     this._securitySystemService.isPrimaryService = true;
 
     return this._securitySystemService;
+  }
+
+  getZoneServices() {
+    let services = [];
+
+    for (let zoneLabel of this.zones) {
+      const zoneSwitch = new Service.Switch(`${this.name} ${zoneLabel} Zone`, `zone-${zoneLabel}`);
+
+      zoneSwitch.getCharacteristic(Characteristic.On)
+        .on('set', (value, callback) => this._setAlarm(zoneLabel, value, callback))
+        .updateValue(this._state.zonesAlarm[zoneLabel] || false);
+
+      services.push(zoneSwitch);
+    }
+
+    return services;
   }
 
   identify(callback) {
@@ -137,12 +162,22 @@ class SecuritySystemAccessory {
     this._setState(targetState, callback);
   }
 
-  _setAlarm(value, callback) {
-    this.log(`Change alarm state of ${this.name} to ${value}`);
+  _setAlarm(zone, value, callback) {
+    this.log(`Change alarm state of ${this.name} / Zone ${zone} to ${value}`);
 
     const data = clone(this._state);
-    data.alarm = value;
+    data.zonesAlarm[zone] = value;
     this._persist(data, callback);
+  }
+
+  _isAlarm() {
+    for (let zoneLabel in this._state.zonesAlarm) {
+      if (this._state.zonesAlarm[zoneLabel]) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   _persist(data, callback) {
@@ -165,7 +200,7 @@ class SecuritySystemAccessory {
 
   _updateCurrentState() {
     let currentState = this._state.targetState;
-    if (this._state.alarm && !this._isDisarmed()) {
+    if (this._isAlarm() && !this._isDisarmed()) {
       currentState = Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED;
     }
 
