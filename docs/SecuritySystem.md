@@ -67,7 +67,7 @@ Starting from iOS 10, location based automations [cannot change the status of se
 
 Linking a location based automation to Arm/Disarm a Security System will make iOS asks the user to manually confirm before running the automation. 
 
-This plugin exposes an ``Arm Away`` and ``Arm Home`` switches (named for example ``My DIY security system Arm Away``) to work around this limitation. You can now link your location-based automation with this switch to arm/disarm the alarm when leaving/arriving home. 
+This plugin exposes an ``Arm Away`` and ``Arm Stay`` switches (named for example ``My DIY security system Arm Away``) to work around this limitation. You can now link your location-based automation with this switch to arm/disarm the alarm when leaving/arriving home. 
 
 Please note: the location of your phone might be inaccurate; using this switch is at your own risk.   
 
