@@ -67,7 +67,7 @@ class SliderAccessory {
       maxValue: this.config.maxValue,
     };
 
-    const valueCharacteristic = this._sliderService.getCharacteristic(Characteristic.SliderValue)
+    this._sliderService.getCharacteristic(Characteristic.SliderValue)
       .on('set', this._setValue.bind(this))
       .setProps(props)
       .updateValue(this._state.value);
