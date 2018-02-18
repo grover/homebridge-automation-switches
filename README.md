@@ -85,7 +85,7 @@ This platform and the switches it creates have been verified to work with the fo
 
 ## Credits
 
-This plugin was initially forked from and inspired by [homebridge-delay-switch](https://github.com/nitaybz/homebridge-delay-switch) by @nitaybz
+See [CONTRIBUTORS](CONTRIBUTORS.md) for acknowledgements to the individuals that contributed to this plugin.
 
 ## Some asks for friendly gestures
 
