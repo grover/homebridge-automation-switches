@@ -1,0 +1,28 @@
+{
+  "bridge": {
+    "name": "Homebridge-Security-System",
+    "username": "AD:32:25:A3:CE:31",
+    "port": 53718,
+    "pin": "135-79-863"
+  },
+  "platforms": [
+    {
+      "platform": "AutomationSwitches",
+      "switches": [
+        {
+          "type": "security",
+          "name": "My DIY security system",
+          "stored": true,
+          "default": "unarmed",
+          "zones": [
+            "Living room",
+            "Bedroom",
+            "Back door"
+          ],
+          "armAwayButtonLabel": "Arm (Away)",
+          "armStayButtonLabel": "Arm (Stay)"
+        }
+      ]
+    }
+  ]
+}

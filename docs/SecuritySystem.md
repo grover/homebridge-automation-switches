@@ -27,7 +27,11 @@ as a button to trigger an alarm.
           "name": "My DIY security system",
           "default": "unarmed",
           "stored": false,
-          "zones": ["Living room", "Bedroom", "Back door"]
+          "zones": [
+            "Living room", 
+            "Bedroom", 
+            "Back door"
+          ]
         }
       ]
     }
@@ -101,3 +105,7 @@ When motion detected in the Bedroom
 And Security System State is Night Arm
 Then Set Bedroom Zone to ON
 ```
+
+# Example configuration
+
+An example configuration of for the security system, which is ready to run, can be seen [in the examples folder](../examples/securitysystem/config.json).
