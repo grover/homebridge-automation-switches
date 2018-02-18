@@ -38,6 +38,9 @@ class SecuritySystemAccessory {
     }
 
     storage.retrieve(defaultValue, (error, value) => {
+
+      value.zonesAlarm = value.zonesAlarm || [];
+
       // Remove zones from storage that are not in the list anymore
       for (let zoneLabel in value.zonesAlarm) {
         if (this.zones.indexOf(zoneLabel) === -1) {
