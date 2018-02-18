@@ -24,15 +24,31 @@ class SecuritySystemAccessory {
     this.log = log;
     this.name = config.name;
     this.version = config.version;
+    this.zones = config.zones || ['Alarm'];
+    this.armAwayButtonLabel = config.armAwayButtonLabel || 'Arm Away';
+    this.armStayButtonLabel = config.armStayButtonLabel || 'Arm Stay';
 
     this._storage = storage;
 
     const defaultValue = {
       targetState: this._pickDefault(config.default),
-      alarm: false
+      zonesAlarm: {},
     };
 
+    for (let zoneLabel of this.zones) {
+      defaultValue.zonesAlarm[zoneLabel] = false;
+    }
+
     storage.retrieve(defaultValue, (error, value) => {
+      // Remove zones from storage that are not in the list anymore
+      for (let zoneLabel in value.zonesAlarm) {
+        if (this.zones.indexOf(zoneLabel) === -1) {
+          delete value.zonesAlarm[zoneLabel];
+        }
+      }
+
+      storage.store(value, () => true);
+
       this._state = value;
     });
 
@@ -59,8 +75,24 @@ class SecuritySystemAccessory {
     return [
       this.getAccessoryInformationService(),
       this.getBridgingStateService(),
-      this.getSecuritySystemService()
+      this.getSecuritySystemService(),
+      ...this.getArmSwitchServices(),
+      ...this.getZoneServices(),
     ];
+  }
+
+  getArmSwitchServices() {
+    this._armAwaySwitchService = new Service.Switch(`${this.name} ${this.armAwayButtonLabel}`, 'arm-away');
+    this._armAwaySwitchService.getCharacteristic(Characteristic.On)
+      .on('set', (value, callback) => this._setArm(value, callback, Characteristic.SecuritySystemTargetState.AWAY_ARM))
+      .updateValue(this._isArmAway());
+
+    this._armStaySwitchService = new Service.Switch(`${this.name} ${this.armStayButtonLabel}`, 'arm-stay');
+    this._armStaySwitchService.getCharacteristic(Characteristic.On)
+      .on('set', (value, callback) => this._setArm(value, callback, Characteristic.SecuritySystemTargetState.STAY_ARM))
+      .updateValue(this._isArmStay());
+
+    return [this._armAwaySwitchService, this._armStaySwitchService];
   }
 
   getAccessoryInformationService() {
@@ -90,13 +122,25 @@ class SecuritySystemAccessory {
     this._securitySystemService.getCharacteristic(Characteristic.SecuritySystemCurrentState)
       .updateValue(this._state.targetState);
 
-    this._securitySystemService.addCharacteristic(Characteristic.AlarmTrigger)
-      .on('set', this._setAlarm.bind(this))
-      .updateValue(this._state.alarm);
-
     this._securitySystemService.isPrimaryService = true;
 
     return this._securitySystemService;
+  }
+
+  getZoneServices() {
+    let services = [];
+
+    for (let zoneLabel of this.zones) {
+      const zoneSwitch = new Service.Switch(`${this.name} ${zoneLabel} Zone`, `zone-${zoneLabel}`);
+
+      zoneSwitch.getCharacteristic(Characteristic.On)
+        .on('set', (value, callback) => this._setAlarm(zoneLabel, value, callback))
+        .updateValue(this._state.zonesAlarm[zoneLabel] || false);
+
+      services.push(zoneSwitch);
+    }
+
+    return services;
   }
 
   identify(callback) {
@@ -112,12 +156,45 @@ class SecuritySystemAccessory {
     this._persist(data, callback);
   }
 
-  _setAlarm(value, callback) {
-    this.log(`Change alarm state of ${this.name} to ${value}`);
+  _setArm(value, callback, armState) {
+    let targetState;
+    if (value) {
+      targetState = armState;
+    } else {
+      targetState = Characteristic.SecuritySystemTargetState.DISARM;
+    }
+
+    this._securitySystemService
+      .getCharacteristic(Characteristic.SecuritySystemTargetState)
+      .updateValue(targetState);
+
+    this._setState(targetState, callback);
+  }
+
+  _setAlarm(zone, value, callback) {
+    this.log(`Change alarm state of ${this.name} / Zone ${zone} to ${value}`);
 
     const data = clone(this._state);
-    data.alarm = value;
+    data.zonesAlarm[zone] = value;
     this._persist(data, callback);
+  }
+
+  _isAlarm() {
+    for (let zoneLabel in this._state.zonesAlarm) {
+      if (this._state.zonesAlarm[zoneLabel]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  _isArmAway() {
+    return this._state.targetState === Characteristic.SecuritySystemCurrentState.AWAY_ARM;
+  }
+
+  _isArmStay() {
+    return this._state.targetState === Characteristic.SecuritySystemCurrentState.STAY_ARM;
   }
 
   _persist(data, callback) {
@@ -133,15 +210,28 @@ class SecuritySystemAccessory {
     });
   }
 
+  _isDisarmed() {
+    let currentState = this._state.targetState;
+    return currentState === Characteristic.SecuritySystemCurrentState.DISARMED;
+  }
+
   _updateCurrentState() {
     let currentState = this._state.targetState;
-    if (this._state.alarm && currentState !== Characteristic.SecuritySystemCurrentState.DISARMED) {
+    if (this._isAlarm() && !this._isDisarmed()) {
       currentState = Characteristic.SecuritySystemCurrentState.ALARM_TRIGGERED;
     }
 
     this._securitySystemService
       .getCharacteristic(Characteristic.SecuritySystemCurrentState)
       .updateValue(currentState);
+
+    this._armAwaySwitchService
+      .getCharacteristic(Characteristic.On)
+      .updateValue(this._isArmAway());
+
+    this._armStaySwitchService
+      .getCharacteristic(Characteristic.On)
+      .updateValue(this._isArmStay());
   }
 }
 

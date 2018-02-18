@@ -44,7 +44,8 @@ The following configuration example shows all switches in combination. The confi
           "type": "security",
           "name": "My DIY security system",
           "default": "unarmed",
-          "stored": true
+          "stored": true,
+          "zones": ["Living room", "Bedroom", "Back door"]
         }
       ]
     }
