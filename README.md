@@ -3,6 +3,16 @@
 
 A platform that provides configurable switches for automation purposes. This platform can be created to provide time delayed responses in HomeKit rules or to simulate security systems.
 
+## Status
+
+[![HitCount](http://hits.dwyl.io/grover/homebridge-automation-switches.svg)](https://github.com/grover/homebridge-automation-switches)
+[![Build Status](https://travis-ci.org/grover/homebridge-automation-switches.png?branch=master)](https://travis-ci.org/grover/homebridge-automation-switches)
+[![Dependency Status](https://img.shields.io/david/grover/homebridge-automation-switches.svg?style=flat-square)](https://david-dm.org/grover/homebridge-automation-switches)
+[![devDependency Status](https://img.shields.io/david/dev/grover/homebridge-automation-switches.svg?style=flat-square)](https://david-dm.org/grover/homebridge-automation-switches#info=devDependencies)
+[![Node version](https://img.shields.io/node/v/homebridge-automation-switches.svg?style=flat)](http://nodejs.org/download/)
+[![Node version](https://img.shields.io/node/v/homebridge-automation-switches.svg?style=flat)](http://nodejs.org/download/)
+[![NPM Version](https://badge.fury.io/js/homebridge-automation-switches.svg?style=flat)](https://npmjs.org/package/homebridge-automation-switches)
+
 ## Why do we need this plugin?
 
 This platform provides software based, optionally persistent, switches to create DIY HomeKit solutions.
