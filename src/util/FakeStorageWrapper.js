@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class FakeStorageWrapper {
   store(value, callback) {
@@ -8,6 +8,6 @@ class FakeStorageWrapper {
   retrieve(defaultValue, callback) {
     callback(undefined, defaultValue);
   }
-};
+}
 
 module.exports = FakeStorageWrapper;

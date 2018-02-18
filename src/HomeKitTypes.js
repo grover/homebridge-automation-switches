@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var inherits = require('util').inherits;
 
@@ -48,4 +48,4 @@ module.exports = {
     inherits(Service.SwitchProgram, Service);
     Service.SwitchProgram.UUID = 'FD92B7CF-A343-4D7E-9467-FD251E22C374';
   }
-}
+};

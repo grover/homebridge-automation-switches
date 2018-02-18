@@ -1,15 +1,8 @@
-"use strict";
+'use strict';
 
-const version = require('../package.json').version;
 const clone = require('clone');
-const inherits = require('util').inherits;
 
 let Accessory, Characteristic, Service;
-
-const SwitchStates = [
-  'Off',
-  'On'
-];
 
 class SwitchAccessory {
 

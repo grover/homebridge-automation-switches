@@ -1,8 +1,6 @@
-"use strict";
+'use strict';
 
-const version = require('../package.json').version;
 const clone = require('clone');
-const inherits = require('util').inherits;
 
 let Accessory, Characteristic, Service;
 
@@ -93,7 +91,7 @@ class SwitchAccessory {
   }
 
   getMotionSensorService() {
-    this._motionSensor =  new Service.MotionSensor(this.name);
+    this._motionSensor = new Service.MotionSensor(this.name);
     return this._motionSensor;
   }
 
@@ -103,7 +101,7 @@ class SwitchAccessory {
   }
 
   _setOn(on, callback) {
-    this.log("Setting switch state to " + on);
+    this.log(`Setting switch state to ${on}`);
 
     this._resetTimer();
 
@@ -119,14 +117,14 @@ class SwitchAccessory {
 
       if (on) {
         this._startTimer();
-      }  
+      }
     });
 
     callback();
   }
 
   _setPeriod(value, callback) {
-    this.log("Setting period value: d=" + value + "s");
+    this.log(`Setting period value: d=${value}s`);
 
     const data = clone(this._state);
     data.period = value;
@@ -135,7 +133,7 @@ class SwitchAccessory {
   }
 
   _setAutoOff(value, callback) {
-    this.log("Setting auto off value " + value);
+    this.log(`Setting auto off value ${value}`);
 
     const data = clone(this._state);
     data.autoOff = value;
@@ -146,7 +144,7 @@ class SwitchAccessory {
   _startTimer() {
     const delay = this._state.period * 1000;
 
-    this.log("Starting timer for " + delay + "ms");
+    this.log(`Starting timer for ${delay}ms`);
     this._timer = setTimeout(this._onTimeout.bind(this), delay);
   }
 
@@ -164,22 +162,21 @@ class SwitchAccessory {
 
   onTimerExpired() {
     if (this._state.autoOff) {
-      this.log("Reseting switch");
-      
+      this.log('Reseting switch');
+
       const data = clone(this._state);
       data.state = false;
-    
+
       this._persist(data, (error) => {
         if (error) {
           this.log('Storing the state change has failed.');
-          callback(error);
           return;
         }
-  
+
         this._switchService
           .getCharacteristic(Characteristic.On)
           .updateValue(false, undefined, undefined);
-      });      
+      });
     }
 
     this.signalMotion(true);

@@ -31,12 +31,12 @@ module.exports = (homebridge) => {
   HOMEBRIDGE.UUIDGen = homebridge.hap.uuid;
 
   homebridge.registerPlatform(platformName, platformPrettyName, AutomationSwitchesPlatform, true);
-}
+};
 
 const AutomationSwitchesPlatform = class {
   constructor(log, config, api) {
     this.log = log;
-    this.log('AutomationSwitchesPlatform Plugin Loaded');
+    this.log(`AutomationSwitchesPlatform Plugin Loaded - Version ${version}`);
     this.config = config;
     this.api = api;
 
@@ -106,7 +106,7 @@ const AutomationSwitchesPlatform = class {
 
   _createAutomationSwitch(sw, storage) {
     // Make sure minimal configuration is set
-    sw.autoOff = typeof sw.autoOff !== "undefined" ? sw.autoOff : true;
+    sw.autoOff = typeof sw.autoOff !== 'undefined' ? sw.autoOff : true;
     sw.period = sw.period || 60;
     sw.version = version;
 
@@ -127,4 +127,4 @@ const AutomationSwitchesPlatform = class {
     sw.version = version;
     return new SwitchAccessory(this.api, this.log, sw, storage);
   }
-}
+};

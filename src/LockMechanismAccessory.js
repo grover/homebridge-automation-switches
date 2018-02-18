@@ -1,10 +1,6 @@
-"use strict";
+'use strict';
 
-const version = require('../package.json').version;
 const clone = require('clone');
-const inherits = require('util').inherits;
-
-const NameFactory = require('./util/NameFactory');
 
 let Accessory, Characteristic, Service;
 

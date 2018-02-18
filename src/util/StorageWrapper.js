@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const Storage = require('node-persist').create();
 const NameFactory = require('./NameFactory');
@@ -12,7 +12,7 @@ class StorageWrapper {
   }
 
   store(value, callback) {
-    Storage.setItem(this._key, value, (error, result) => {
+    Storage.setItem(this._key, value, (error) => {
       if (error) {
         callback(error);
         return;
@@ -38,6 +38,6 @@ class StorageWrapper {
       callback(undefined, data);
     });
   }
-};
+}
 
 module.exports = StorageWrapper;
