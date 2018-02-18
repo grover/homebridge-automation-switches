@@ -62,6 +62,7 @@ Please see the documentation for each type of switch this plugin is able to crea
 - [Lock mechanism](docs/LockMechanism.md)
 - [Security system](docs/SecuritySystem.md)
 - [Switch](docs/Switch.md)
+- [Slider](docs/Slider.md)
 
 An advanced configuration example containing all four switch types can be found [here](docs/Configuration.md).
 

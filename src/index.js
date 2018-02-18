@@ -7,6 +7,7 @@ const AutomationSwitchAccessory = require('./AutomationSwitchAccessory');
 const SecuritySystemAccessory = require('./SecuritySystemAccessory');
 const LockMechanismAccessory = require('./LockMechanismAccessory');
 const SwitchAccessory = require('./SwitchAccessory');
+const SliderAccessory = require('./SliderAccessory');
 
 const StorageWrapper = require('./util/StorageWrapper');
 const FakeStorageWrapper = require('./util/FakeStorageWrapper');
@@ -46,7 +47,8 @@ const AutomationSwitchesPlatform = class {
       automation: this._createAutomationSwitch.bind(this),
       lock: this._createLockMechanism.bind(this),
       security: this._createSecuritySwitch.bind(this),
-      switch: this._createSwitch.bind(this)
+      switch: this._createSwitch.bind(this),
+      slider: this._createSlider.bind(this),
     };
   }
 
@@ -126,5 +128,10 @@ const AutomationSwitchesPlatform = class {
   _createSwitch(sw, storage) {
     sw.version = version;
     return new SwitchAccessory(this.api, this.log, sw, storage);
+  }
+
+  _createSlider(sw, storage) {
+    sw.version = version;
+    return new SliderAccessory(this.api, this.log, sw, storage);
   }
 };

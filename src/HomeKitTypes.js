@@ -47,5 +47,32 @@ module.exports = {
     };
     inherits(Service.SwitchProgram, Service);
     Service.SwitchProgram.UUID = 'FD92B7CF-A343-4D7E-9467-FD251E22C374';
+
+    /******************************************************
+     * Slider switch
+     */
+
+    Characteristic.SliderValue = function () {
+      Characteristic.call(this, 'Value', '38AFD9A5-A0C5-42D9-ACD0-1BE08D4FF3F7');
+
+      this.setProps({
+        format: Characteristic.Formats.INT,
+        perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE],
+      });
+
+      this.value = this.getDefaultValue();
+    };
+    inherits(Characteristic.SliderValue, Characteristic);
+    Characteristic.SliderValue.UUID = '38AFD9A5-A0C5-42D9-ACD0-1BE08D4FF3F7';
+
+
+    Service.Slider = function (displayName, subtype) {
+      Service.call(this, displayName, 'DDFC25B3-3624-44CA-9477-FDC977FC7C81', subtype);
+
+      // Required Characteristics
+      this.addCharacteristic(Characteristic.SliderValue);
+    };
+    inherits(Service.Slider, Service);
+    Service.Slider.UUID = 'DDFC25B3-3624-44CA-9477-FDC977FC7C81';
   }
 };

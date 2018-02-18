@@ -1,0 +1,23 @@
+{
+  "bridge": {
+    "name": "Homebridge-Slider",
+    "username": "AD:31:25:A3:CE:31",
+    "port": 53718,
+    "pin": "135-79-863"
+  },
+  "platforms": [
+    {
+      "platform": "AutomationSwitches",
+      "switches": [
+        {
+          "type": "slider",
+          "name": "Example Slider",
+          "stored": true,
+          "default": 5,
+          "minValue": 1,
+          "maxValue": 10
+        }
+      ]
+    }
+  ]
+}
