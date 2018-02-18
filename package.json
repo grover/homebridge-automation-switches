@@ -22,12 +22,12 @@
     "url": "http://github.com/grover/homebridge-automation-switches/issues"
   },
   "engines": {
-    "node": ">=0.12.0",
-    "homebridge": ">=0.2.0"
+    "node": ">=9.3.0",
+    "homebridge": ">=0.4.36"
   },
   "dependencies": {
     "clone": "^2.1.1",
-    "node-persist": "^0.0.8"
+    "node-persist": "^0.0.11"
   },
   "devDependencies": {
     "eslint": "^4.18.0",
