@@ -23,8 +23,9 @@ class SecuritySystemAccessory {
     this.name = config.name;
     this.version = config.version;
     this.zones = config.zones || ['Alarm'];
-    this.armAwayButtonLabel = config.armAwayButtonLabel || 'Arm Away';
-    this.armStayButtonLabel = config.armStayButtonLabel || 'Arm Stay';
+    this.armAwayButtonLabel = config.armAwayButtonLabel || `${this.name} Arm Away`;
+    this.armStayButtonLabel = config.armStayButtonLabel || `${this.name} Arm Stay`;
+    this.armNightButtonLabel = config.armNightButtonLabel || `${this.name} Arm Night`;
 
     this._storage = storage;
 
@@ -83,17 +84,22 @@ class SecuritySystemAccessory {
   }
 
   getArmSwitchServices() {
-    this._armAwaySwitchService = new Service.Switch(`${this.name} ${this.armAwayButtonLabel}`, 'arm-away');
+    this._armAwaySwitchService = new Service.Switch(this.armAwayButtonLabel, 'arm-away');
     this._armAwaySwitchService.getCharacteristic(Characteristic.On)
       .on('set', (value, callback) => this._setArm(value, callback, Characteristic.SecuritySystemTargetState.AWAY_ARM))
       .updateValue(this._isArmAway());
 
-    this._armStaySwitchService = new Service.Switch(`${this.name} ${this.armStayButtonLabel}`, 'arm-stay');
+    this._armStaySwitchService = new Service.Switch(this.armStayButtonLabel, 'arm-stay');
     this._armStaySwitchService.getCharacteristic(Characteristic.On)
       .on('set', (value, callback) => this._setArm(value, callback, Characteristic.SecuritySystemTargetState.STAY_ARM))
       .updateValue(this._isArmStay());
 
-    return [this._armAwaySwitchService, this._armStaySwitchService];
+    this._armNightSwitchService = new Service.Switch(this.armNightButtonLabel, 'arm-night');
+    this._armNightSwitchService.getCharacteristic(Characteristic.On)
+      .on('set', (value, callback) => this._setArm(value, callback, Characteristic.SecuritySystemTargetState.NIGHT_ARM))
+      .updateValue(this._isArmNight());
+
+    return [this._armAwaySwitchService, this._armStaySwitchService, this._armNightSwitchService];
   }
 
   getAccessoryInformationService() {
@@ -196,6 +202,10 @@ class SecuritySystemAccessory {
 
   _isArmStay() {
     return this._state.targetState === Characteristic.SecuritySystemCurrentState.STAY_ARM;
+  }
+
+  _isArmNight() {
+    return this._state.targetState === Characteristic.SecuritySystemCurrentState.NIGHT_ARM;
   }
 
   _persist(data, callback) {

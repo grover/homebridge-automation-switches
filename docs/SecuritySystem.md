@@ -31,7 +31,10 @@ as a button to trigger an alarm.
             "Living room", 
             "Bedroom", 
             "Back door"
-          ]
+          ],
+          "armAwayButtonLabel": "Arm Away",
+          "armNightButtonLabel": "Arm Night",
+          "armStayButtonLabel": "Arm Stay"
         }
       ]
     }
@@ -48,8 +51,9 @@ as a button to trigger an alarm.
 | default | No | This configures the default state of the security system if it is not yet stored, never stored or the storage has become faulty. Set this to ```unarmed```, or ```armed-away```, ```armed-stay``` or ```armed-night``` depending on your needs. By default a security system is ```unarmed``` if this is not specified. |
 | stored | No | The state of security systems are by default stored. Set this to ```false``` if you do not want the security system to retain its armed/unarmed and alarm state across restarts. |
 | zones | No | A list of "alarm zones". Each zone will have it's own switch to trigger the alarm. The support for zones will help you detect what has caused the alarm and what to do about it. |
-| armAwayButtonLabel | No | The label of the button to Arm the alarm in the "Away" mode (Default "Arm Away") |
-| armStayButtonLabel | No | The label of the button to Arm the alarm in the "Home" mode (Default "Arm Stay") |
+| armAwayButtonLabel | No | The label of the button to Arm the alarm in the "Away" mode (Default "[Name] Arm Away") |
+| armNightButtonLabel | No | The label of the button to Arm the alarm in the "Night" mode (Default "[Name] Arm Night") |
+| armStayButtonLabel | No | The label of the button to Arm the alarm in the "Home" mode (Default "[Name]Arm Stay") |
 
 See [configuration](Configuration.md) for more advanced configuration examples.
 
@@ -71,10 +75,9 @@ Starting from iOS 10, location based automations [cannot change the status of se
 
 Linking a location based automation to Arm/Disarm a Security System will make iOS asks the user to manually confirm before running the automation. 
 
-This plugin exposes an ``Arm Away`` and ``Arm Stay`` switches (named for example ``My DIY security system Arm Away``) to work around this limitation. You can now link your location-based automation with this switch to arm/disarm the alarm when leaving/arriving home. 
+This plugin exposes an ``Arm Away``, ``Arm Night`` and ``Arm Stay`` switches (named for example ``My DIY security system Arm Away``) to work around this limitation. You can now link your location-based automation with this switch to arm/disarm the alarm when leaving/arriving home.
 
-Please note: the location of your phone might be inaccurate; using this switch is at your own risk.   
-
+Please note: the location of your phone might be inaccurate; use these switches at your own risk.
 
 ## Typical rules for the security system
 
@@ -106,6 +109,6 @@ And Security System State is Night Arm
 Then Set Bedroom Zone to ON
 ```
 
-# Example configuration
+## Example configuration
 
 An example configuration of for the security system, which is ready to run, can be seen [in the examples folder](../examples/securitysystem/config.json).
