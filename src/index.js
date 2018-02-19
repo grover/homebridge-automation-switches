@@ -8,11 +8,13 @@ const SecuritySystemAccessory = require('./SecuritySystemAccessory');
 const LockMechanismAccessory = require('./LockMechanismAccessory');
 const SwitchAccessory = require('./SwitchAccessory');
 const SliderAccessory = require('./SliderAccessory');
+const AlarmClockAccessory = require('./AlarmClockAccessory');
 
 const StorageWrapper = require('./util/StorageWrapper');
 const FakeStorageWrapper = require('./util/FakeStorageWrapper');
 
 const HomeKitTypes = require('./HomeKitTypes');
+const ClockTypes = require('./hap/ClockTypes');
 
 
 const HOMEBRIDGE = {
@@ -42,6 +44,7 @@ const AutomationSwitchesPlatform = class {
     this.api = api;
 
     HomeKitTypes.registerWith(api.hap);
+    ClockTypes.registerWith(api.hap);
 
     this._factories = {
       automation: this._createAutomationSwitch.bind(this),
@@ -49,6 +52,7 @@ const AutomationSwitchesPlatform = class {
       security: this._createSecuritySwitch.bind(this),
       switch: this._createSwitch.bind(this),
       slider: this._createSlider.bind(this),
+      alarmclock: this._createAlarmClock.bind(this)
     };
   }
 
@@ -133,5 +137,10 @@ const AutomationSwitchesPlatform = class {
   _createSlider(sw, storage) {
     sw.version = version;
     return new SliderAccessory(this.api, this.log, sw, storage);
+  }
+
+  _createAlarmClock(sw, storage) {
+    sw.version = version;
+    return new AlarmClockAccessory(this.api, this.log, sw, storage);
   }
 };

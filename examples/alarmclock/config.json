@@ -1,0 +1,23 @@
+{
+  "bridge": {
+    "name": "Homebridge-Alarm-Clock-Bridge",
+    "username": "BA:32:25:A3:CE:31",
+    "port": 53718,
+    "pin": "135-79-863"
+  },
+  "platforms": [
+    {
+      "platform": "AutomationSwitches",
+      "switches": [
+        {
+          "type": "alarmclock",
+          "name": "HomeKit Alarm Clock",
+          "stored": true,
+          "hour": 9,
+          "minute": 0,
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}
