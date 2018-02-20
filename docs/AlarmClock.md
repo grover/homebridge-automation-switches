@@ -64,7 +64,7 @@ time in your local time. Upon startup lines similar to the following are written
 [2018-2-20 11:50:17] [AutomationSwitches] UTC time is Tue, 20 Feb 2018 10:50:17 GMT
 ```
 
-The local time line and the timezone line are important to ensure that the alarms fire of at the right time. Verify that your
+The local time line and the timezone line are important to ensure that the alarms fire off at the right time. Verify that your
 timezone is set up correctly and the local time logged matches the actual local wall clock time.
 
 * [Configure the timezone on Linux](https://unix.stackexchange.com/questions/110522/timezone-setting-in-linux)
@@ -73,7 +73,7 @@ timezone is set up correctly and the local time logged matches the actual local 
 
 Additionally it is recommended to ensure that NTP is working properly and that your device syncs with an NTP server 
 frequently enough to compensate for [clock drift](https://en.wikipedia.org/wiki/Clock_drift). Ensure that either [systemd timesyncd](https://wiki.archlinux.org/index.php/systemd-timesyncd) 
-is running or [setup an NTP client](http://raspberrypi.tomasgreno.cz/ntp-client-and-server.html).
+is running or [setup an NTP client](http://raspberrypi.tomasgreno.cz/ntp-client-and-server.html) if you're on Linux.
 
 ## Usage
 
