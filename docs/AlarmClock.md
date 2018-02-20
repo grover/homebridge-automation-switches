@@ -53,6 +53,28 @@ The above example creates an alarm clock, which by default closes the contact se
 
 The defaults are only used if the stored state is unavailable.
 
+## Beware of clocks, timezones and drift
+
+The alarm clock depends upon proper timezone configuration for the alarm to fire at the right time. The sliders configure the 
+time in your local time. Upon startup lines similar to the following are written to the log:
+
+```text
+[2018-2-20 11:50:17] [AutomationSwitches] Timezone is Europe/Berlin
+[2018-2-20 11:50:17] [AutomationSwitches] Local time is 2018-2-20 11:50:17
+[2018-2-20 11:50:17] [AutomationSwitches] UTC time is Tue, 20 Feb 2018 10:50:17 GMT
+```
+
+The local time line and the timezone line are important to ensure that the alarms fire of at the right time. Verify that your
+timezone is set up correctly and the local time logged matches the actual local wall clock time.
+
+* [Configure the timezone on Linux](https://unix.stackexchange.com/questions/110522/timezone-setting-in-linux)
+
+> Node.js and this plugin depends upon the TZ environment variable being set properly.
+
+Additionally it is recommended to ensure that NTP is working properly and that your device syncs with an NTP server 
+frequently enough to compensate for [clock drift](https://en.wikipedia.org/wiki/Clock_drift). Ensure that either [systemd timesyncd](https://wiki.archlinux.org/index.php/systemd-timesyncd) 
+is running or [setup an NTP client](http://raspberrypi.tomasgreno.cz/ntp-client-and-server.html).
+
 ## Usage
 
 The contact sensor of the above alarm clock is closed every day at 09:00. Attach a HomeKit rule to the contact sensor to

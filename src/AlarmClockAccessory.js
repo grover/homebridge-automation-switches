@@ -15,6 +15,10 @@ class AlarmClockAccessory {
     this.name = config.name;
     this.version = config.version;
 
+    this.log(`Timezone is ${process.env.TZ}`);
+    this.log(`Local time is ${new Date().toLocaleString()}`);
+    this.log(`UTC time is ${new Date().toUTCString()}`);
+
     this._storage = storage;
 
     const defaultValue = {
