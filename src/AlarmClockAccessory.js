@@ -15,6 +15,9 @@ class AlarmClockAccessory {
     this.name = config.name;
     this.version = config.version;
 
+    this._alarmValue = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
+    this._noAlarmValue = Characteristic.ContactSensorState.CONTACT_DETECTED;
+
     this.log(`Timezone is ${process.env.TZ}`);
     this.log(`Local time is ${new Date().toLocaleString()}`);
     this.log(`UTC time is ${new Date().toUTCString()}`);
@@ -96,7 +99,7 @@ class AlarmClockAccessory {
   getContactSensorService() {
     this._contactSensor = new Service.ContactSensor(`${this.name} Alarm`);
     this._contactSensor.getCharacteristic(Characteristic.ContactSensorState)
-      .updateValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+      .updateValue(this._noAlarmValue);
 
     return this._contactSensor;
   }
@@ -178,7 +181,7 @@ class AlarmClockAccessory {
   _alarm() {
     this.log('Alarm!');
     this._contactSensor.getCharacteristic(Characteristic.ContactSensorState)
-      .updateValue(Characteristic.ContactSensorState.CONTACT_DETECTED);
+      .updateValue(this._alarmValue);
 
     setTimeout(this._silenceAlarm.bind(this), 1000);
   }
@@ -186,7 +189,7 @@ class AlarmClockAccessory {
   _silenceAlarm() {
     this.log('Alarm silenced!');
     this._contactSensor.getCharacteristic(Characteristic.ContactSensorState)
-      .updateValue(Characteristic.ContactSensorState.CONTACT_NOT_DETECTED);
+      .updateValue(this._noAlarmValue);
     this._scheduleAlarmClock();
   }
 }
