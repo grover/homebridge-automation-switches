@@ -64,8 +64,12 @@ class SliderAccessory {
 
     const props = {
       minValue: this.config.minValue,
-      maxValue: this.config.maxValue,
+      maxValue: this.config.maxValue
     };
+
+    if (this.config.minStep !== undefined) {
+      props.minStep = this.config.minStep;
+    }
 
     this._sliderService.getCharacteristic(Characteristic.SliderValue)
       .on('set', this._setValue.bind(this))

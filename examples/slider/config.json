@@ -16,6 +16,15 @@
           "default": 5,
           "minValue": 1,
           "maxValue": 10
+        },
+        {
+          "type": "slider",
+          "name": "Example Slider with step 2",
+          "stored": true,
+          "default": 4,
+          "minValue": 0,
+          "maxValue": 10,
+          "minStep": 2
         }
       ]
     }
