@@ -243,6 +243,10 @@ class SecuritySystemAccessory {
     this._armStaySwitchService
       .getCharacteristic(Characteristic.On)
       .updateValue(this._isArmStay());
+
+    this._armNightSwitchService
+      .getCharacteristic(Characteristic.On)
+      .updateValue(this._isArmNight());
   }
 }
 
