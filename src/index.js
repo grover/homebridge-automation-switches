@@ -12,6 +12,7 @@ const AlarmClockAccessory = require('./AlarmClockAccessory');
 
 const StorageWrapper = require('./util/StorageWrapper');
 const FakeStorageWrapper = require('./util/FakeStorageWrapper');
+const SerialNumberGenerator = require('./util/SerialNumberGenerator');
 
 const HomeKitTypes = require('./HomeKitTypes');
 const ClockTypes = require('./hap/ClockTypes');
@@ -34,6 +35,15 @@ module.exports = (homebridge) => {
   HOMEBRIDGE.UUIDGen = homebridge.hap.uuid;
 
   homebridge.registerPlatform(platformName, platformPrettyName, AutomationSwitchesPlatform, true);
+};
+
+const SerialNumberPrefixes = {
+  automation: 'AU',
+  lock: 'LK',
+  security: 'SC',
+  switch: 'SW',
+  slider: 'SL',
+  alarmclock: 'AC'
 };
 
 const AutomationSwitchesPlatform = class {
@@ -78,6 +88,8 @@ const AutomationSwitchesPlatform = class {
         this.log('Skipping.');
         return;
       }
+
+      sw.serialNumber = SerialNumberGenerator.generate(SerialNumberPrefixes[sw.type], sw.name);
 
       const storage = this._createStorage(sw);
 

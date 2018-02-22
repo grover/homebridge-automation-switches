@@ -1,0 +1,21 @@
+{
+  "bridge": {
+    "name": "Homebridge-Switch",
+    "username": "CA:31:25:A3:CE:31",
+    "port": 53718,
+    "pin": "135-79-864"
+  },
+  "platforms": [
+    {
+      "platform": "AutomationSwitches",
+      "switches": [
+        {
+          "type": "switch",
+          "name": "Example Switch",
+          "stored": true,
+          "default": false
+        }
+      ]
+    }
+  ]
+}
