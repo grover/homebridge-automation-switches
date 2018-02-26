@@ -21,7 +21,8 @@ class SecuritySystemAccessory {
 
     this.log = log;
     this.name = config.name;
-    this.version = config.version;
+    this._config = config;
+
     this.zones = config.zones || ['Alarm'];
     this.armAwayButtonLabel = config.armAwayButtonLabel || `${this.name} Arm Away`;
     this.armStayButtonLabel = config.armStayButtonLabel || `${this.name} Arm Stay`;
@@ -107,9 +108,9 @@ class SecuritySystemAccessory {
       .setCharacteristic(Characteristic.Name, this.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Michael Froehlich')
       .setCharacteristic(Characteristic.Model, 'Security System')
-      .setCharacteristic(Characteristic.SerialNumber, '43')
-      .setCharacteristic(Characteristic.FirmwareRevision, this.version)
-      .setCharacteristic(Characteristic.HardwareRevision, this.version);
+      .setCharacteristic(Characteristic.SerialNumber, this._config.serialNumber)
+      .setCharacteristic(Characteristic.FirmwareRevision, this._config.version)
+      .setCharacteristic(Characteristic.HardwareRevision, this._config.version);
   }
 
   getBridgingStateService() {

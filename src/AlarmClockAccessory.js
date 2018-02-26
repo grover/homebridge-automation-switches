@@ -13,7 +13,7 @@ class AlarmClockAccessory {
 
     this.log = log;
     this.name = config.name;
-    this.version = config.version;
+    this._config = config;
 
     this._alarmValue = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
     this._noAlarmValue = Characteristic.ContactSensorState.CONTACT_DETECTED;
@@ -60,9 +60,9 @@ class AlarmClockAccessory {
       .setCharacteristic(Characteristic.Name, this.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Michael Froehlich')
       .setCharacteristic(Characteristic.Model, 'Switch')
-      .setCharacteristic(Characteristic.SerialNumber, '44')
-      .setCharacteristic(Characteristic.FirmwareRevision, this.version)
-      .setCharacteristic(Characteristic.HardwareRevision, this.version);
+      .setCharacteristic(Characteristic.SerialNumber, this._config.serialNumber)
+      .setCharacteristic(Characteristic.FirmwareRevision, this._config.version)
+      .setCharacteristic(Characteristic.HardwareRevision, this._config.version);
   }
 
   getBridgingStateService() {
