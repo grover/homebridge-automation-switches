@@ -34,7 +34,8 @@ as a button to trigger an alarm.
           ],
           "armAwayButtonLabel": "Arm Away",
           "armNightButtonLabel": "Arm Night",
-          "armStayButtonLabel": "Arm Stay"
+          "armStayButtonLabel": "Arm Stay",
+          "turnOffZonesWhenDisarming": false
         }
       ]
     }
@@ -54,6 +55,7 @@ as a button to trigger an alarm.
 | armAwayButtonLabel | No | The label of the button to Arm the alarm in the "Away" mode (Default "[Name] Arm Away") |
 | armNightButtonLabel | No | The label of the button to Arm the alarm in the "Night" mode (Default "[Name] Arm Night") |
 | armStayButtonLabel | No | The label of the button to Arm the alarm in the "Home" mode (Default "[Name]Arm Stay") |
+| turnOffZonesWhenDisarming  | No | Set this to ```true``` to turn off all the zones when disarming the alarm |
 
 See [configuration](Configuration.md) for more advanced configuration examples.
 
