@@ -1,12 +1,10 @@
 'use strict';
 
-const clone = require('clone');
-
 let Accessory, Characteristic, Service;
 
 class RandomAccessory {
 
-  constructor(api, log, config, storage) {
+  constructor(api, log, config) {
     Accessory = api.hap.Accessory;
     Characteristic = api.hap.Characteristic;
     Service = api.hap.Service;
@@ -75,12 +73,12 @@ class RandomAccessory {
     const minValue = 1;
     const maxValue = this._maxValue;
 
-    const randomValue = parseInt(Math.floor(Math.random() * (maxValue - minValue + 1) + minValue));
-    this.log(`Picked random value: ${randomValue}`);
+    this._state.randomValue = parseInt(Math.floor(Math.random() * (maxValue - minValue + 1) + minValue));
+    this.log(`Picked random value: ${this._state.randomValue}`);
 
     this._switchService
       .getCharacteristic(Characteristic.RandomValue)
-      .updateValue(randomValue);
+      .updateValue(this._state.randomValue);
   }
 
   _setState(value, callback) {
