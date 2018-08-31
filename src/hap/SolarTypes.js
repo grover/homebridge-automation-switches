@@ -94,18 +94,27 @@ module.exports = {
     inherits(Characteristic.SolarPeriod, Characteristic);
     Characteristic.SolarPeriod.UUID = '4D640A06-34FE-45D7-BF7C-736BB2CF5693';
     Characteristic.SolarPeriod._SolarPeriods = SolarPeriods;
+    Characteristic.SolarPeriod._SolarTimes = [ 'night', 'dawn', 'sunrise', 'sunriseEnd', 'sunsetStart', 'sunset' ];
 
 
     Service.Solar = function (displayName, subtype) {
       Service.call(this, displayName, Service.Solar.UUID, subtype);
 
       // Required Characteristics
-      this.addCharacteristic(Characteristic.SolarLatitude);
-      this.addCharacteristic(Characteristic.SolarLongitude);
-      this.addCharacteristic(Characteristic.SolarMinutesOffset);
       this.addCharacteristic(Characteristic.SolarPeriod);
+      this.addCharacteristic(Characteristic.SolarMinutesOffset);
     };
     inherits(Service.Solar, Service);
     Service.Solar.UUID = 'F9305C45-DBC5-4BD1-B4DA-C67A495288CD';
+
+    Service.SolarLocation = function (displayName, subtype) {
+      Service.call(this, displayName, Service.SolarLocation.UUID, subtype);
+
+      // Required Characteristics
+      this.addCharacteristic(Characteristic.SolarLatitude);
+      this.addCharacteristic(Characteristic.SolarLongitude);
+    };
+    inherits(Service.SolarLocation, Service);
+    Service.SolarLocation.UUID = '0C982673-8293-4CE4-8AC3-9371980D81A7';
   }
 };
