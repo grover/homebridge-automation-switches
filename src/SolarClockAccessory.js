@@ -63,6 +63,7 @@ class SolarClockAccessory {
       this.getAccessoryInformationService(),
       this.getBridgingStateService(),
       this.getSolarService(),
+      this.getSolarLocationService(),
       this.getEnabledSwitchService(),
       this.getContactSensorService()
     ];
@@ -87,9 +88,7 @@ class SolarClockAccessory {
   }
 
   getSolarService() {
-    this._solarService = new Service.Solar(`${this.name} Period`)
-      .setCharacteristic(Characteristic.SolarLatitude, this.location.latitude)
-      .setCharacteristic(Characteristic.SolarLongitude, this.location.longitude);
+    this._solarService = new Service.Solar(`${this.name} Period`);
     this._solarService.getCharacteristic(Characteristic.SolarPeriod)
       .on('set', this._setPeriod.bind(this))
       .updateValue(this._state.period);
@@ -98,6 +97,14 @@ class SolarClockAccessory {
       .updateValue(this._state.offset);
 
     return this._solarService;
+  }
+
+  getSolarLocationService() {
+    this._solarLocationService = new Service.SolarLocation(`${this.name} Location`)
+      .setCharacteristic(Characteristic.SolarLatitude, this.location.latitude)
+      .setCharacteristic(Characteristic.SolarLongitude, this.location.longitude);
+
+    return this._solarLocationService;
   }
 
   getEnabledSwitchService() {
@@ -177,58 +184,28 @@ class SolarClockAccessory {
 
   _scheduleSolarClock() {
     ///////////////////////////////////////////////////////////////////////////////////////////
-    // algorithm taken from https://github.com/kcharwood/homebridge-suncalc
+    // algorithm based on https://github.com/kcharwood/homebridge-suncalc
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    const nowDate = new Date();
-    const now = nowDate.getTime();
+    const today = new Date();
+    const now = today.getTime();
+    const solarTime = Characteristic.SolarPeriod._SolarTimes[this._state.period];
 
-    const sunDates = suncalc.getTimes(nowDate, this.location.latitude, this.location.longitude);
-    const times = {
-      nightEnd: sunDates.nightEnd.getTime(),
-      nauticalDawn: sunDates.nauticalDawn.getTime(),
-      dawn: sunDates.dawn.getTime(),
-      sunrise: sunDates.sunrise.getTime(),
-      sunriseEnd: sunDates.sunriseEnd.getTime(),
-      sunsetStart: sunDates.sunsetStart.getTime(),
-      sunset: sunDates.sunset.getTime(),
-      dusk: sunDates.dusk.getTime(),
-      nauticalDusk: sunDates.nauticalDusk.getTime(),
-      night: sunDates.night.getTime()
-    };
+    let sunDates = suncalc.getTimes(today, this.location.latitude, this.location.longitude);
+    let timeout = sunDates[solarTime].getTime() + (this._state.offset * 60 * 1000);
+    let diff = timeout - now;
 
-    let solarPeriod = 0;
-    let nextUpdate;
-
-    if (now < times.dawn) {
-      nextUpdate = times.dawn;
-    } else if (now >= times.dawn && now < times.sunrise) {
-      nextUpdate = times.sunrise;
-      solarPeriod = 1;
-    } else if (now >= times.sunrise && now < times.sunriseEnd) {
-      nextUpdate = times.sunriseEnd;
-      solarPeriod = 2;
-    } else if (now >= times.sunriseEnd && now < times.sunsetStart) {
-      nextUpdate = times.sunsetStart;
-      solarPeriod = 3;
-    } else if (now >= times.sunsetStart && now < times.sunset) {
-      nextUpdate = times.sunset;
-      solarPeriod = 4;
-    } else if (now >= times.sunset && now < times.dusk){
-      nextUpdate = times.dusk;
-      solarPeriod = 5;
-    } else {
+    if (timeout <= now) {
       const tomorrow = new Date();
 
       tomorrow.setDate(tomorrow.getDate() + 1);
-      nextUpdate = suncalc.getTimes(tomorrow, this.location.latitude, this.location.longitude).dawn.getTime();
+      sunDates = suncalc.getTimes(tomorrow, this.location.latitude, this.location.longitude);
+      timeout = sunDates[solarTime].getTime() + (this._state.offset * 60 * 1000);
+      diff = timeout - now;
     }
 
-    this.log(`Current Solar Period ${solarPeriod}`);
-    if (this._state.period === solarPeriod) this._solar();
-
-    this.log(`Time to next update ${nextUpdate - now}ms`);
-    this._timer = setTimeout(this._scheduleSolarClock.bind(this), nextUpdate - now);
+    this.log(`Raising next solar timer for ${solarTime} at ${new Date(timeout).toLocaleString()} in ${Math.round(diff / (60 * 1000))}mins`);
+    this._timer = setTimeout(this._solar.bind(this), diff);
   }
 
   _solar() {
