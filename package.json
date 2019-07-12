@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "clone": "^2.1.1",
+    "lodash": "4.17.13",
     "node-persist": "^0.0.11",
     "suncalc": "^1.8.0"
   },
