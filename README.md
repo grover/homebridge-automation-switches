@@ -65,6 +65,7 @@ Please see the documentation for each type of switch this plugin is able to crea
 - [Slider](docs/Slider.md)
 - [Alarm Clock](docs/AlarmClock.md)
 - [Random value](docs/Random.md)
+- [Solar Clock](docs/SolarClock.md)
 
 An advanced configuration example containing all four switch types can be found [here](docs/Configuration.md).
 

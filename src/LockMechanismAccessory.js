@@ -21,7 +21,7 @@ class LockMechanismAccessory {
 
     this.log = log;
     this.name = config.name;
-    this.version = config.version;
+    this._config = config;
 
     this._storage = storage;
 
@@ -65,9 +65,9 @@ class LockMechanismAccessory {
       .setCharacteristic(Characteristic.Name, this.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Michael Froehlich')
       .setCharacteristic(Characteristic.Model, 'Lock Mechanism')
-      .setCharacteristic(Characteristic.SerialNumber, '45')
-      .setCharacteristic(Characteristic.FirmwareRevision, this.version)
-      .setCharacteristic(Characteristic.HardwareRevision, this.version);
+      .setCharacteristic(Characteristic.SerialNumber, this._config.serialNumber)
+      .setCharacteristic(Characteristic.FirmwareRevision, this._config.version)
+      .setCharacteristic(Characteristic.HardwareRevision, this._config.version);
   }
 
   getBridgingStateService() {

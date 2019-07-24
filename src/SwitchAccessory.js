@@ -13,7 +13,7 @@ class SwitchAccessory {
 
     this.log = log;
     this.name = config.name;
-    this.config = config;
+    this._config = config;
 
     this._storage = storage;
 
@@ -45,9 +45,9 @@ class SwitchAccessory {
       .setCharacteristic(Characteristic.Name, this.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Michael Froehlich')
       .setCharacteristic(Characteristic.Model, 'Switch')
-      .setCharacteristic(Characteristic.SerialNumber, this.config.serialNumber)
-      .setCharacteristic(Characteristic.FirmwareRevision, this.config.version)
-      .setCharacteristic(Characteristic.HardwareRevision, this.config.version);
+      .setCharacteristic(Characteristic.SerialNumber, this._config.serialNumber)
+      .setCharacteristic(Characteristic.FirmwareRevision, this._config.version)
+      .setCharacteristic(Characteristic.HardwareRevision, this._config.version);
   }
 
   getBridgingStateService() {

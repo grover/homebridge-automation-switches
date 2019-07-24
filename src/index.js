@@ -10,6 +10,7 @@ const SwitchAccessory = require('./SwitchAccessory');
 const SliderAccessory = require('./SliderAccessory');
 const AlarmClockAccessory = require('./AlarmClockAccessory');
 const RandomAccessory = require('./RandomAccessory');
+const SolarClockAccessory = require('./SolarClockAccessory');
 
 const StorageWrapper = require('./util/StorageWrapper');
 const FakeStorageWrapper = require('./util/FakeStorageWrapper');
@@ -18,7 +19,7 @@ const SerialNumberGenerator = require('./util/SerialNumberGenerator');
 const HomeKitTypes = require('./HomeKitTypes');
 const ClockTypes = require('./hap/ClockTypes');
 const RandomTypes = require('./hap/RandomTypes');
-
+const SolarTypes = require('./hap/SolarTypes');
 
 const HOMEBRIDGE = {
   Accessory: null,
@@ -47,6 +48,7 @@ const SerialNumberPrefixes = {
   slider: 'SL',
   alarmclock: 'AC',
   random: 'RA',
+  solarclock: 'BC'
 };
 
 const AutomationSwitchesPlatform = class {
@@ -59,6 +61,7 @@ const AutomationSwitchesPlatform = class {
     HomeKitTypes.registerWith(api.hap);
     ClockTypes.registerWith(api.hap);
     RandomTypes.registerWith(api.hap);
+    SolarTypes.registerWith(api.hap);
 
     this._factories = {
       automation: this._createAutomationSwitch.bind(this),
@@ -68,6 +71,7 @@ const AutomationSwitchesPlatform = class {
       slider: this._createSlider.bind(this),
       alarmclock: this._createAlarmClock.bind(this),
       random: this._createRandom.bind(this),
+      solarclock: this._createSolarClock.bind(this)
     };
   }
 
@@ -164,5 +168,10 @@ const AutomationSwitchesPlatform = class {
   _createRandom(sw, storage) {
     sw.version = version;
     return new RandomAccessory(this.api, this.log, sw, storage);
+  }
+
+  _createSolarClock(sw, storage) {
+    sw.version = version;
+    return new SolarClockAccessory(this.api, this.log, sw, storage);
   }
 };

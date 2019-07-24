@@ -13,8 +13,7 @@ class SliderAccessory {
 
     this.log = log;
     this.name = config.name;
-    this.version = config.version;
-    this.config = config;
+    this._config = config;
 
     this._storage = storage;
 
@@ -46,9 +45,9 @@ class SliderAccessory {
       .setCharacteristic(Characteristic.Name, this.name)
       .setCharacteristic(Characteristic.Manufacturer, 'Michael Froehlich')
       .setCharacteristic(Characteristic.Model, 'Slider')
-      .setCharacteristic(Characteristic.SerialNumber, '46')
-      .setCharacteristic(Characteristic.FirmwareRevision, this.version)
-      .setCharacteristic(Characteristic.HardwareRevision, this.version);
+      .setCharacteristic(Characteristic.SerialNumber, this._config.serialNumber)
+      .setCharacteristic(Characteristic.FirmwareRevision, this._config.version)
+      .setCharacteristic(Characteristic.HardwareRevision, this._config.version);
   }
 
   getBridgingStateService() {
@@ -63,12 +62,12 @@ class SliderAccessory {
     this._sliderService = new Service.Slider(this.name);
 
     const props = {
-      minValue: this.config.minValue,
-      maxValue: this.config.maxValue
+      minValue: this._config.minValue,
+      maxValue: this._config.maxValue
     };
 
-    if (this.config.minStep !== undefined) {
-      props.minStep = this.config.minStep;
+    if (this._config.minStep !== undefined) {
+      props.minStep = this._config.minStep;
     }
 
     this._sliderService.getCharacteristic(Characteristic.SliderValue)
