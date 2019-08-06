@@ -191,7 +191,10 @@ class SwitchAccessory {
 
   nextPeriod() {
     this.signalMotion(false);
-    if (!this._state.autoOff && this._state.state === false) {
+    if (this._state.autoOff) {
+    this._state.state = false;
+    }
+    if (!this._state.autoOff && this._state.state === true) {
       this._startTimer();
     }
   }
