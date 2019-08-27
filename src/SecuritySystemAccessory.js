@@ -27,6 +27,7 @@ class SecuritySystemAccessory {
     this.armAwayButtonLabel = config.armAwayButtonLabel || `${this.name} Arm Away`;
     this.armStayButtonLabel = config.armStayButtonLabel || `${this.name} Arm Stay`;
     this.armNightButtonLabel = config.armNightButtonLabel || `${this.name} Arm Night`;
+    this.turnOffZonesWhenDisarming = config.turnOffZonesWhenDisarming || false;
 
     this._storage = storage;
 
@@ -136,19 +137,21 @@ class SecuritySystemAccessory {
   }
 
   getZoneServices() {
-    let services = [];
+    let zoneServices = {};
 
     for (let zoneLabel of this.zones) {
       const zoneSwitch = new Service.Switch(`${this.name} ${zoneLabel} Zone`, `zone-${zoneLabel}`);
 
       zoneSwitch.getCharacteristic(Characteristic.On)
         .on('set', (value, callback) => this._setAlarm(zoneLabel, value, callback))
-        .updateValue(this._state.zonesAlarm[zoneLabel] || false);
+        .updateValue(this._isZoneAlarmed(zoneLabel));
 
-      services.push(zoneSwitch);
+      zoneServices[zoneLabel] = zoneSwitch;
     }
 
-    return services;
+    this._zoneServices = zoneServices;
+
+    return Object.values(this._zoneServices);
   }
 
   identify(callback) {
@@ -161,6 +164,13 @@ class SecuritySystemAccessory {
 
     const data = clone(this._state);
     data.targetState = value;
+
+    if (this.turnOffZonesWhenDisarming) {
+      for (let zoneLabel in data.zonesAlarm) {
+        data.zonesAlarm[zoneLabel] = false;
+      }
+    }
+
     this._persist(data, callback);
   }
 
@@ -209,6 +219,10 @@ class SecuritySystemAccessory {
     return this._state.targetState === Characteristic.SecuritySystemCurrentState.NIGHT_ARM;
   }
 
+  _isZoneAlarmed(zoneLabel) {
+    return this._state.zonesAlarm[zoneLabel] || false;
+  }
+
   _persist(data, callback) {
     this._storage.store(data, (error) => {
       if (error) {
@@ -248,6 +262,12 @@ class SecuritySystemAccessory {
     this._armNightSwitchService
       .getCharacteristic(Characteristic.On)
       .updateValue(this._isArmNight());
+
+    for (let zoneLabel in this._zoneServices) {
+      this._zoneServices[zoneLabel]
+        .getCharacteristic(Characteristic.On)
+        .updateValue(this._isZoneAlarmed(zoneLabel));
+    }
   }
 }
 
