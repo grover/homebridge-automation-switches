@@ -16,6 +16,8 @@ The automation switch provides a programming service, which allows dynamic chang
 |---|---|---|---|
 | Period | `B469181F-D796-46B4-8D99-5FBE4BA9DC9C` | READ, WRITE | `FD92B7CF-A343-4D7E-9467-FD251E22C374` | The period of the switch in seconds. This value can be changed between 1s and 3600s. A change will only take effect the next time the switch is turned on. |
 | AutomaticOff | `72227266-CA42-4442-AB84-0A7D55A0F08D` | `FD92B7CF-A343-4D7E-9467-FD251E22C374` | READ, WRITE | Determines if the switch is shut off after the period has elapsed. If the switch is not automatically shut off, the timer will be restarted and the motion sensor will be triggered again until the switch is shut off externally. |
+| SignalMotionOnActivation | `1BA034D5-5882-44E5-9C70-606D590DE42E` | `FD92B7CF-A343-4D7E-9467-FD251E22C374` | READ, WRITE | Determines if the switch signals the motion sensors when the switch is first activated (i.e. turned on). If false (the default), the first motion occurs after `Period` seconds have elapsed. |
+
 
 Both of these characteristics are provided on the custom SwitchProgramService.
 

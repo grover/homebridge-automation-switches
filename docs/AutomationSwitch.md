@@ -32,7 +32,8 @@ The switch support two modes: An automatic shut off mode, where the motion senso
           "type": "automation",
           "name": "Automation Switch #1",
           "period": 1800,
-          "autoOff": false
+          "autoOff": false,
+          "signalMotionOnActivation": false
         }
       ]
     }
@@ -48,6 +49,7 @@ The switch support two modes: An automatic shut off mode, where the motion senso
 | name | Yes | A unique name for the automation switch. Will be used as the accessory name. |
 | period | Yes | The default time delay of the switch in seconds, before the sensor is triggered. |
 | autoOff | Yes | Set this to ```true``` to automatically turn the switch off after the period has expired once, ```false``` to keep the triggering the sensor until it has expired. |
+| signalMotionOnActivation | No | Set this to ```true``` to automatically trigger motion when the switch is first activated. |
 | default | No | Specifies the default state of the switch. This is used if the switch is not yet stored, not stored or the storage has become faulty. The default state is ```false``` if not specified, which means the switch is off. Setting this to ```true``` turns the switch on by default. |
 | stored | No | Set this to true if you want the switch to retain its on/off state across restarts. The default setting for the ```switch``` type is  ```false```. |
 

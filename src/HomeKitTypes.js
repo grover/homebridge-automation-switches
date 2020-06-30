@@ -22,6 +22,19 @@ module.exports = {
     inherits(Characteristic.AutomaticOff, Characteristic);
     Characteristic.AutomaticOff.UUID = '72227266-CA42-4442-AB84-0A7D55A0F08D';
 
+    Characteristic.SignalMotionOnActivation = function () {
+      Characteristic.call(this, 'Signal Motion on Activation', '1BA034D5-5882-44E5-9C70-606D590DE42E');
+
+      this.setProps({
+        format: Characteristic.Formats.BOOL,
+        perms: [Characteristic.Perms.READ, Characteristic.Perms.WRITE],
+      });
+
+      this.value = this.getDefaultValue();
+    };
+    inherits(Characteristic.SignalMotionOnActivation, Characteristic);
+    Characteristic.SignalMotionOnActivation.UUID = '1BA034D5-5882-44E5-9C70-606D590DE42E';
+
     Characteristic.PeriodInSeconds = function () {
       Characteristic.call(this, 'Period', 'B469181F-D796-46B4-8D99-5FBE4BA9DC9C');
 
@@ -44,6 +57,7 @@ module.exports = {
       // Required Characteristics
       this.addCharacteristic(Characteristic.PeriodInSeconds);
       this.addCharacteristic(Characteristic.AutomaticOff);
+      this.addCharacteristic(Characteristic.SignalMotionOnActivation);
     };
     inherits(Service.SwitchProgram, Service);
     Service.SwitchProgram.UUID = 'FD92B7CF-A343-4D7E-9467-FD251E22C374';

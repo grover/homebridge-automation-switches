@@ -40,7 +40,8 @@ After [Homebridge](https://github.com/nfarina/homebridge) has been installed:
           "type": "automation",
           "name": "Automation Switch #1",
           "period": 1800,
-          "autoOff": false
+          "autoOff": false,
+          "signalMotionOnActivation": false
         },
         {
           "type": "security",
