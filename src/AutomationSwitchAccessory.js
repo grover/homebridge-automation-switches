@@ -20,6 +20,7 @@ class SwitchAccessory {
     const defaultValue = {
       autoOff: config.autoOff,
       period: config.period,
+      signalMotionOnActivation: config.signalMotionOnActivation === undefined ? false : config.signalMotionOnActivation,
       state: config.default === undefined ? false : config.default
     };
 
@@ -87,6 +88,10 @@ class SwitchAccessory {
       .on('set', this._setAutoOff.bind(this))
       .updateValue(this._state.autoOff);
 
+    program.getCharacteristic(Characteristic.SignalMotionOnActivation)
+      .on('set', this._setSignalMotionOnActivation.bind(this))
+      .updateValue(this._state.signalMotionOnActivation);
+
     return program;
   }
 
@@ -116,7 +121,12 @@ class SwitchAccessory {
       }
 
       if (on) {
-        this._startTimer();
+        if (this._state.signalMotionOnActivation) {
+          this.signalMotion(true);
+          setTimeout(this.nextPeriod.bind(this), 1000);
+        } else {
+          this._startTimer();
+        }
       }
     });
 
@@ -137,6 +147,15 @@ class SwitchAccessory {
 
     const data = clone(this._state);
     data.autoOff = value;
+
+    this._persist(data, callback);
+  }
+
+  _setSignalMotionOnActivation(value, callback) {
+    this.log(`Setting signal motion on activation value ${value}`);
+
+    const data = clone(this._state);
+    data.signalMotionOnActivation = value;
 
     this._persist(data, callback);
   }
